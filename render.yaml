@@ -6,7 +6,7 @@
 
 services:
   - type: web
-    name: power-sales-bi
+    name: HTML-Shablon
     env: node
     plan: free
     region: frankfurt # eu-central-1 (минимальная задержка до Neon PostgreSQL)

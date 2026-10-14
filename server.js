@@ -336,7 +336,7 @@ app.post('/api/fetch-remote', async (req, res) => {
 app.get('/api/health', (req, res) => {
   return res.json({
     status: 'ok',
-    service: 'power-sales-bi',
+    service: 'HTML-Shablon',
     database: db.isPostgres() ? 'neon-cloud-postgresql (eu-central-1)' : 'local-storage',
     rls: true,
     uptime: process.uptime(),

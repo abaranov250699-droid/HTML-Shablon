@@ -1,4 +1,4 @@
-# 🏗️ Power Sales BI & Email Builder — Облачная Инфраструктура
+# 🏗️ HTML-Shablon — Облачная Инфраструктура
 
 Профессиональный веб-сервис для создания адаптивных HTML-писем с серверной инфраструктурой корпоративного уровня, изоляцией данных арендаторов (Multi-Tenant Row Level Security) и непрерывной доставкой (CI/CD).
 
@@ -16,7 +16,7 @@
  ┌─────────────────────────────────────────────────────────────┐
  │                Хостинг Render.com (Web Service)              │
  │  Платформа: Node.js + Express.js                            │
- │  Репозиторий GitHub: power-sales-bi (ветка main)            │
+ │  Репозиторий GitHub: HTML-Shablon (ветка main)              │
  │  CI/CD: Автоматический build & deploy при каждом git push    │
  │  REST API: /api/auth, /api/templates, /api/custom-widgets   │
  └──────────────────────────────┬──────────────────────────────┘
@@ -68,7 +68,7 @@ npm run db:migrate
 - **Раздача статики:** Лендинг (`/`, `/landing`), каталог готовых макетов (`/templates`), визуальный редактор (`/editor`), пресеты и загрузки.
 - **Аутентификация:** Полноценный JWT-механизм (JSON Web Tokens) с хешированием паролей через `bcryptjs`. Токен содержит идентификаторы пользователя и его арендатора (`tenantId`).
 - **Хостинг:** [Render.com](https://render.com) (Web Service).
-- **CI/CD:** Привязка к GitHub-репозиторию `power-sales-bi`. При каждом `git push` в ветку `main` Render автоматически собирает свежий код (`npm install`) и перезапускает веб-сервис без простоя.
+- **CI/CD:** Привязка к GitHub-репозиторию `HTML-Shablon`. При каждом `git push` в ветку `main` Render автоматически собирает свежий код (`npm install`) и перезапускает веб-сервис без простоя.
 
 ---
 
@@ -103,7 +103,7 @@ npm run db:migrate
 
 ### Шаг 2. Развертывание на Render.com
 1. Зайдите в [Render Dashboard](https://dashboard.render.com).
-2. Выберите **New +** -> **Blueprint** (или **Web Service**) и подключите ваш репозиторий GitHub `power-sales-bi`.
+2. Выберите **New +** -> **Blueprint** (или **Web Service**) и подключите ваш репозиторий GitHub `HTML-Shablon`.
 3. Файл [`render.yaml`](file:///c:/Users/User/Desktop/HTML%20%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD%D0%B8%D0%B7%D0%B0%D1%82%D0%BE%D1%80/render.yaml) автоматически сконфигурирует сборку:
    - **Environment:** Node
    - **Region:** Frankfurt (eu-central-1)

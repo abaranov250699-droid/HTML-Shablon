@@ -288,6 +288,45 @@ app.post('/api/fetch-remote', async (req, res) => {
   }
 });
 
+// Загрузка локальных файлов (SVG, PNG, JPG, WebP) на сервер
+app.post('/api/upload', (req, res) => {
+  try {
+    const { data } = req.body;
+    if (!data) return res.status(400).json({ error: 'Нет данных файла' });
+
+    let buffer;
+    let ext = '.svg';
+    if (data.startsWith('data:')) {
+      const match = data.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        const mime = match[1].toLowerCase();
+        if (mime.includes('png')) ext = '.png';
+        else if (mime.includes('jpeg') || mime.includes('jpg')) ext = '.jpg';
+        else if (mime.includes('webp')) ext = '.webp';
+        else if (mime.includes('gif')) ext = '.gif';
+        else if (mime.includes('svg')) ext = '.svg';
+        buffer = Buffer.from(match[2], 'base64');
+      } else {
+        buffer = Buffer.from(data, 'utf-8');
+      }
+    } else {
+      buffer = Buffer.from(data, 'utf-8');
+    }
+
+    const safeName = `upload_${Date.now()}_${Math.random().toString(36).substring(2, 7)}${ext}`;
+    const savePath = path.join(UPLOADS_DIR, safeName);
+    fs.writeFileSync(savePath, buffer);
+
+    const localUrl = `/uploads/${safeName}`;
+    return res.json({
+      success: true,
+      url: localUrl
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Ошибка сохранения файла: ' + err.message });
+  }
+});
+
 // ==================== HEALTHCHECK ДЛЯ RENDER.COM ====================
 app.get('/api/health', (req, res) => {
   return res.json({

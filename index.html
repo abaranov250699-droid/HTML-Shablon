@@ -250,6 +250,32 @@
       color: #ffffff;
     }
 
+    .mode-toggle {
+      display: inline-flex;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 3px 8px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    .mode-btn:hover {
+      color: var(--text-main);
+      background: #f0f0eb;
+    }
+    .mode-btn.active {
+      background-color: #0a0a0a;
+      color: #ffffff;
+    }
+
     .hint-box {
       font-size: 0.75rem;
       color: var(--text-muted);
@@ -794,38 +820,68 @@
       <div class="section-card" id="card-header">
         <div class="section-title">
           <span>Заголовок письма</span>
-        </div>
-        <div class="form-group">
-          <label>Текст заголовка</label>
-          <input type="text" id="headerText" value="Специальное предложение для вас!">
-        </div>
-        <div class="input-row">
-          <div class="form-group">
-            <label>Размер шрифта (px)</label>
-            <input type="number" id="headerFontSize" value="26" min="14" max="48">
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn active" id="btnHeaderModeText">Текст</button>
+            <button type="button" class="mode-btn" id="btnHeaderModeSvg">SVG</button>
           </div>
+        </div>
+
+        <!-- Текстовый режим заголовка -->
+        <div id="headerTextControls">
           <div class="form-group">
-            <label>Цвет текста</label>
-            <div class="color-picker-wrap">
-              <input type="color" id="headerColor" value="#0f172a">
-              <input type="text" id="headerColorText" value="#0f172a">
+            <label>Текст заголовка</label>
+            <input type="text" id="headerText" value="Специальное предложение для вас!">
+          </div>
+          <div class="input-row">
+            <div class="form-group">
+              <label>Размер шрифта (px)</label>
+              <input type="number" id="headerFontSize" value="26" min="14" max="48">
+            </div>
+            <div class="form-group">
+              <label>Цвет текста</label>
+              <div class="color-picker-wrap">
+                <input type="color" id="headerColor" value="#0f172a">
+                <input type="text" id="headerColorText" value="#0f172a">
+              </div>
+            </div>
+          </div>
+          <div class="input-row" style="margin-top: 8px;">
+            <div class="form-group">
+              <label>Ширина блока (px)</label>
+              <input type="number" id="headerW" value="540" min="100" max="600">
+            </div>
+            <div class="form-group">
+              <label>Выравнивание текста</label>
+              <div class="align-selector" data-target="headerAlign">
+                <button class="align-btn active" data-val="left">Лево</button>
+                <button class="align-btn" data-val="center">Центр</button>
+                <button class="align-btn" data-val="right">Право</button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="input-row" style="margin-top: 8px;">
+
+        <!-- SVG режим заголовка -->
+        <div id="headerSvgControls" style="display: none;">
           <div class="form-group">
-            <label>Ширина блока (px)</label>
-            <input type="number" id="headerW" value="540" min="100" max="600">
+            <label>Ссылка на SVG заголовка (URL или Яндекс.Диск)</label>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="headerSvgUrl" placeholder="https://... или ссылка на .svg" style="flex: 1;">
+              <button class="btn btn-secondary" id="btnClearHeaderSvg" title="Удалить SVG" style="padding: 6px 12px; font-size: 1rem; line-height: 1;">&times;</button>
+            </div>
+            <div class="upload-btn-wrap">
+              <label class="btn-file" for="headerSvgFileInput">Загрузить SVG с компьютера</label>
+              <input type="file" id="headerSvgFileInput" accept=".svg,image/svg+xml,image/*" style="display: none;">
+            </div>
+            <div class="status-text" id="headerSvgStatusText">Обработка SVG...</div>
           </div>
           <div class="form-group">
-            <label>Выравнивание текста</label>
-            <div class="align-selector" data-target="headerAlign">
-              <button class="align-btn active" data-val="left">Лево</button>
-              <button class="align-btn" data-val="center">Центр</button>
-              <button class="align-btn" data-val="right">Право</button>
-            </div>
+            <label>Ширина SVG заголовка (px)</label>
+            <input type="number" id="headerSvgWidth" value="540" min="30" max="600">
           </div>
         </div>
+
+        <!-- Координаты (общие для обоих режимов) -->
         <div class="input-row" style="margin-top: 8px;">
           <div class="form-group">
             <label>X (слева, px)</label>
@@ -842,42 +898,72 @@
       <div class="section-card" id="card-body">
         <div class="section-title">
           <span>Основной текст</span>
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn active" id="btnBodyModeText">Текст</button>
+            <button type="button" class="mode-btn" id="btnBodyModeSvg">SVG</button>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Содержимое</label>
-          <textarea id="bodyText" rows="5">Здравствуйте!
+
+        <!-- Текстовый режим -->
+        <div id="bodyTextControls">
+          <div class="form-group">
+            <label>Содержимое</label>
+            <textarea id="bodyText" rows="5">Здравствуйте!
 
 Мы рады сообщить вам о запуске нашей новой программы лояльности. Теперь вы можете получать дополнительные скидки, бонусы и персональные рекомендации на каждый заказ.
 
 Ознакомьтесь с подробными условиями на нашем сайте или свяжитесь с персональным менеджером.</textarea>
-        </div>
-        <div class="input-row">
-          <div class="form-group">
-            <label>Размер шрифта (px)</label>
-            <input type="number" id="bodyFontSize" value="15" min="11" max="24">
           </div>
-          <div class="form-group">
-            <label>Цвет текста</label>
-            <div class="color-picker-wrap">
-              <input type="color" id="bodyColor" value="#334155">
-              <input type="text" id="bodyColorText" value="#334155">
+          <div class="input-row">
+            <div class="form-group">
+              <label>Размер шрифта (px)</label>
+              <input type="number" id="bodyFontSize" value="15" min="11" max="24">
+            </div>
+            <div class="form-group">
+              <label>Цвет текста</label>
+              <div class="color-picker-wrap">
+                <input type="color" id="bodyColor" value="#334155">
+                <input type="text" id="bodyColorText" value="#334155">
+              </div>
+            </div>
+          </div>
+          <div class="input-row" style="margin-top: 8px;">
+            <div class="form-group">
+              <label>Ширина блока (px)</label>
+              <input type="number" id="bodyW" value="540" min="100" max="600">
+            </div>
+            <div class="form-group">
+              <label>Выравнивание</label>
+              <div class="align-selector" data-target="bodyAlign">
+                <button class="align-btn active" data-val="left">Лево</button>
+                <button class="align-btn" data-val="center">Центр</button>
+                <button class="align-btn" data-val="right">Право</button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="input-row" style="margin-top: 8px;">
+
+        <!-- SVG режим текста -->
+        <div id="bodySvgControls" style="display: none;">
           <div class="form-group">
-            <label>Ширина блока (px)</label>
-            <input type="number" id="bodyW" value="540" min="100" max="600">
+            <label>Ссылка на SVG текста (URL или Яндекс.Диск)</label>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="bodySvgUrl" placeholder="https://... или ссылка на .svg" style="flex: 1;">
+              <button class="btn btn-secondary" id="btnClearBodySvg" title="Удалить SVG" style="padding: 6px 12px; font-size: 1rem; line-height: 1;">&times;</button>
+            </div>
+            <div class="upload-btn-wrap">
+              <label class="btn-file" for="bodySvgFileInput">Загрузить SVG с компьютера</label>
+              <input type="file" id="bodySvgFileInput" accept=".svg,image/svg+xml,image/*" style="display: none;">
+            </div>
+            <div class="status-text" id="bodySvgStatusText">Обработка SVG...</div>
           </div>
           <div class="form-group">
-            <label>Выравнивание</label>
-            <div class="align-selector" data-target="bodyAlign">
-              <button class="align-btn active" data-val="left">Лево</button>
-              <button class="align-btn" data-val="center">Центр</button>
-              <button class="align-btn" data-val="right">Право</button>
-            </div>
+            <label>Ширина SVG текста (px)</label>
+            <input type="number" id="bodySvgWidth" value="540" min="30" max="600">
           </div>
         </div>
+
+        <!-- Координаты -->
         <div class="input-row" style="margin-top: 8px;">
           <div class="form-group">
             <label>X (слева, px)</label>
@@ -935,40 +1021,70 @@
       <div class="section-card" id="card-footer">
         <div class="section-title">
           <span>Подпись и подвал</span>
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn active" id="btnFooterModeText">Текст</button>
+            <button type="button" class="mode-btn" id="btnFooterModeSvg">SVG</button>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Текст подписи</label>
-          <textarea id="footerText" rows="3">С уважением,
+
+        <!-- Текстовый режим -->
+        <div id="footerTextControls">
+          <div class="form-group">
+            <label>Текст подписи</label>
+            <textarea id="footerText" rows="3">С уважением,
 Команда клиентского сервиса
 support@example.com | +7 (800) 000-00-00</textarea>
-        </div>
-        <div class="input-row">
-          <div class="form-group">
-            <label>Размер шрифта (px)</label>
-            <input type="number" id="footerFontSize" value="13" min="10" max="20">
           </div>
-          <div class="form-group">
-            <label>Цвет текста</label>
-            <div class="color-picker-wrap">
-              <input type="color" id="footerColor" value="#64748b">
-              <input type="text" id="footerColorText" value="#64748b">
+          <div class="input-row">
+            <div class="form-group">
+              <label>Размер шрифта (px)</label>
+              <input type="number" id="footerFontSize" value="13" min="10" max="20">
+            </div>
+            <div class="form-group">
+              <label>Цвет текста</label>
+              <div class="color-picker-wrap">
+                <input type="color" id="footerColor" value="#64748b">
+                <input type="text" id="footerColorText" value="#64748b">
+              </div>
+            </div>
+          </div>
+          <div class="input-row" style="margin-top: 8px;">
+            <div class="form-group">
+              <label>Ширина блока (px)</label>
+              <input type="number" id="footerW" value="540" min="100" max="600">
+            </div>
+            <div class="form-group">
+              <label>Выравнивание</label>
+              <div class="align-selector" data-target="footerAlign">
+                <button class="align-btn active" data-val="left">Лево</button>
+                <button class="align-btn" data-val="center">Центр</button>
+                <button class="align-btn" data-val="right">Право</button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="input-row" style="margin-top: 8px;">
+
+        <!-- SVG режим -->
+        <div id="footerSvgControls" style="display: none;">
           <div class="form-group">
-            <label>Ширина блока (px)</label>
-            <input type="number" id="footerW" value="540" min="100" max="600">
+            <label>Ссылка на SVG подписи (URL или Яндекс.Диск)</label>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="footerSvgUrl" placeholder="https://... или ссылка на .svg" style="flex: 1;">
+              <button class="btn btn-secondary" id="btnClearFooterSvg" title="Удалить SVG" style="padding: 6px 12px; font-size: 1rem; line-height: 1;">&times;</button>
+            </div>
+            <div class="upload-btn-wrap">
+              <label class="btn-file" for="footerSvgFileInput">Загрузить SVG с компьютера</label>
+              <input type="file" id="footerSvgFileInput" accept=".svg,image/svg+xml,image/*" style="display: none;">
+            </div>
+            <div class="status-text" id="footerSvgStatusText">Обработка SVG...</div>
           </div>
           <div class="form-group">
-            <label>Выравнивание</label>
-            <div class="align-selector" data-target="footerAlign">
-              <button class="align-btn active" data-val="left">Лево</button>
-              <button class="align-btn" data-val="center">Центр</button>
-              <button class="align-btn" data-val="right">Право</button>
-            </div>
+            <label>Ширина SVG подписи (px)</label>
+            <input type="number" id="footerSvgWidth" value="540" min="30" max="600">
           </div>
         </div>
+
+        <!-- Координаты -->
         <div class="input-row" style="margin-top: 8px;">
           <div class="form-group">
             <label>X (слева, px)</label>
@@ -1004,6 +1120,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
             <h1 id="renderHeaderText" style="margin: 0; font-size: 26px; line-height: 1.25; color: #0f172a; font-weight: 700; pointer-events: none;">
               Специальное предложение для вас!
             </h1>
+            <img id="renderHeaderSvg" src="" alt="Заголовок" style="display: none; max-width: 100%; height: auto; pointer-events: none;">
           </div>
 
           <!-- Элемент: Текст -->
@@ -1012,6 +1129,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
             <div id="renderBodyText" style="font-size: 15px; line-height: 1.6; color: #334155; pointer-events: none;">
               Здравствуйте!<br><br>Мы рады сообщить вам о запуске нашей новой программы лояльности.
             </div>
+            <img id="renderBodySvg" src="" alt="Основной текст" style="display: none; max-width: 100%; height: auto; pointer-events: none;">
           </div>
 
           <!-- Элемент: Кнопка CTA -->
@@ -1028,6 +1146,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
             <div id="renderFooterText" style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 13px; line-height: 1.5; color: #64748b; pointer-events: none;">
               С уважением,<br>Команда клиентского сервиса
             </div>
+            <img id="renderFooterSvg" src="" alt="Подпись" style="display: none; max-width: 100%; height: auto; pointer-events: none;">
           </div>
 
         </div>
@@ -1175,7 +1294,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
       logoY: 40,
 
       // Заголовок
+      headerMode: 'text', // 'text' | 'svg'
       headerText: 'Специальное предложение для вас!',
+      headerSvgUrl: '',
+      headerSvgWidth: 540,
       headerFontSize: 26,
       headerColor: '#0f172a',
       headerAlign: 'left',
@@ -1184,7 +1306,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
       headerY: 130,
 
       // Основной текст
+      bodyMode: 'text', // 'text' | 'svg'
       bodyText: `Здравствуйте!\n\nМы рады сообщить вам о запуске нашей новой программы лояльности. Теперь вы можете получать дополнительные скидки, бонусы и персональные рекомендации на каждый заказ.\n\nОзнакомьтесь с подробными условиями на нашем сайте или свяжитесь с персональным менеджером.`,
+      bodySvgUrl: '',
+      bodySvgWidth: 540,
       bodyFontSize: 15,
       bodyColor: '#334155',
       bodyAlign: 'left',
@@ -1201,7 +1326,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
       buttonY: 440,
 
       // Подпись / Подвал
+      footerMode: 'text', // 'text' | 'svg'
       footerText: `С уважением,\nКоманда клиентского сервиса\nsupport@example.com | +7 (800) 000-00-00`,
+      footerSvgUrl: '',
+      footerSvgWidth: 540,
       footerFontSize: 13,
       footerColor: '#64748b',
       footerAlign: 'left',
@@ -1212,6 +1340,28 @@ support@example.com | +7 (800) 000-00-00</textarea>
 
     let currentTemplateId = null;
     let currentUser = null;
+
+    // Переключение видимости контролов (Текст vs SVG) в панели
+    function updateSectionModeUI(prefix) {
+      const mode = state[prefix + 'Mode'] || 'text';
+      const textCtrls = document.getElementById(prefix + 'TextControls');
+      const svgCtrls = document.getElementById(prefix + 'SvgControls');
+      const cap = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+      const btnText = document.getElementById('btn' + cap + 'ModeText');
+      const btnSvg = document.getElementById('btn' + cap + 'ModeSvg');
+
+      if (mode === 'svg') {
+        if (textCtrls) textCtrls.style.display = 'none';
+        if (svgCtrls) svgCtrls.style.display = 'block';
+        if (btnText) btnText.classList.remove('active');
+        if (btnSvg) btnSvg.classList.add('active');
+      } else {
+        if (textCtrls) textCtrls.style.display = 'block';
+        if (svgCtrls) svgCtrls.style.display = 'none';
+        if (btnText) btnText.classList.add('active');
+        if (btnSvg) btnSvg.classList.remove('active');
+      }
+    }
 
     // Обновление интерактивного холста
     function updateCanvas() {
@@ -1248,38 +1398,74 @@ support@example.com | +7 (800) 000-00-00</textarea>
       // Заголовок
       const elemHeader = document.getElementById('elem-header');
       const renderHeaderText = document.getElementById('renderHeaderText');
-      if (state.headerText.trim()) {
+      const renderHeaderSvg = document.getElementById('renderHeaderSvg');
+      if (state.headerMode === 'svg') {
+        renderHeaderText.style.display = 'none';
         elemHeader.style.display = 'block';
         elemHeader.style.left = state.headerX + 'px';
         elemHeader.style.top = state.headerY + 'px';
-        elemHeader.style.width = state.headerW + 'px';
-        renderHeaderText.textContent = state.headerText;
-        renderHeaderText.style.fontSize = state.headerFontSize + 'px';
-        renderHeaderText.style.color = state.headerColor;
-        renderHeaderText.style.textAlign = state.headerAlign;
+        elemHeader.style.width = (state.headerSvgWidth || 540) + 'px';
+        renderHeaderSvg.style.display = 'block';
+        renderHeaderSvg.style.width = (state.headerSvgWidth || 540) + 'px';
+        if (state.headerSvgUrl) {
+          renderHeaderSvg.src = state.headerSvgUrl;
+        } else {
+          renderHeaderSvg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="540" height="60" viewBox="0 0 540 60"><rect width="100%" height="100%" fill="%23f8fafc" stroke="%23cbd5e1" stroke-dasharray="4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="13">SVG заголовок не выбран (загрузите файл в панели)</text></svg>';
+        }
       } else {
-        elemHeader.style.display = 'none';
+        renderHeaderSvg.style.display = 'none';
+        if (state.headerText.trim()) {
+          elemHeader.style.display = 'block';
+          elemHeader.style.left = state.headerX + 'px';
+          elemHeader.style.top = state.headerY + 'px';
+          elemHeader.style.width = state.headerW + 'px';
+          renderHeaderText.style.display = 'block';
+          renderHeaderText.textContent = state.headerText;
+          renderHeaderText.style.fontSize = state.headerFontSize + 'px';
+          renderHeaderText.style.color = state.headerColor;
+          renderHeaderText.style.textAlign = state.headerAlign;
+        } else {
+          elemHeader.style.display = 'none';
+        }
       }
 
       // Основной текст
       const elemBody = document.getElementById('elem-body');
       const renderBodyText = document.getElementById('renderBodyText');
-      if (state.bodyText.trim()) {
+      const renderBodySvg = document.getElementById('renderBodySvg');
+      if (state.bodyMode === 'svg') {
+        renderBodyText.style.display = 'none';
         elemBody.style.display = 'block';
         elemBody.style.left = state.bodyX + 'px';
         elemBody.style.top = state.bodyY + 'px';
-        elemBody.style.width = state.bodyW + 'px';
-        renderBodyText.innerHTML = state.bodyText
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/\n\n/g, '<br><br>')
-          .replace(/\n/g, '<br>');
-        renderBodyText.style.fontSize = state.bodyFontSize + 'px';
-        renderBodyText.style.color = state.bodyColor;
-        renderBodyText.style.textAlign = state.bodyAlign;
+        elemBody.style.width = (state.bodySvgWidth || 540) + 'px';
+        renderBodySvg.style.display = 'block';
+        renderBodySvg.style.width = (state.bodySvgWidth || 540) + 'px';
+        if (state.bodySvgUrl) {
+          renderBodySvg.src = state.bodySvgUrl;
+        } else {
+          renderBodySvg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="540" height="90" viewBox="0 0 540 90"><rect width="100%" height="100%" fill="%23f8fafc" stroke="%23cbd5e1" stroke-dasharray="4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="13">SVG текст не выбран (загрузите файл в панели)</text></svg>';
+        }
       } else {
-        elemBody.style.display = 'none';
+        renderBodySvg.style.display = 'none';
+        if (state.bodyText.trim()) {
+          elemBody.style.display = 'block';
+          elemBody.style.left = state.bodyX + 'px';
+          elemBody.style.top = state.bodyY + 'px';
+          elemBody.style.width = state.bodyW + 'px';
+          renderBodyText.style.display = 'block';
+          renderBodyText.innerHTML = state.bodyText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n\n/g, '<br><br>')
+            .replace(/\n/g, '<br>');
+          renderBodyText.style.fontSize = state.bodyFontSize + 'px';
+          renderBodyText.style.color = state.bodyColor;
+          renderBodyText.style.textAlign = state.bodyAlign;
+        } else {
+          elemBody.style.display = 'none';
+        }
       }
 
       // Кнопка CTA
@@ -1299,21 +1485,39 @@ support@example.com | +7 (800) 000-00-00</textarea>
       // Подпись / Подвал
       const elemFooter = document.getElementById('elem-footer');
       const renderFooterText = document.getElementById('renderFooterText');
-      if (state.footerText.trim()) {
+      const renderFooterSvg = document.getElementById('renderFooterSvg');
+      if (state.footerMode === 'svg') {
+        renderFooterText.style.display = 'none';
         elemFooter.style.display = 'block';
         elemFooter.style.left = state.footerX + 'px';
         elemFooter.style.top = state.footerY + 'px';
-        elemFooter.style.width = state.footerW + 'px';
-        renderFooterText.innerHTML = state.footerText
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/\n/g, '<br>');
-        renderFooterText.style.fontSize = state.footerFontSize + 'px';
-        renderFooterText.style.color = state.footerColor;
-        renderFooterText.style.textAlign = state.footerAlign;
+        elemFooter.style.width = (state.footerSvgWidth || 540) + 'px';
+        renderFooterSvg.style.display = 'block';
+        renderFooterSvg.style.width = (state.footerSvgWidth || 540) + 'px';
+        if (state.footerSvgUrl) {
+          renderFooterSvg.src = state.footerSvgUrl;
+        } else {
+          renderFooterSvg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="540" height="60" viewBox="0 0 540 60"><rect width="100%" height="100%" fill="%23f8fafc" stroke="%23cbd5e1" stroke-dasharray="4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-family="sans-serif" font-size="13">SVG подпись не выбрана (загрузите файл в панели)</text></svg>';
+        }
       } else {
-        elemFooter.style.display = 'none';
+        renderFooterSvg.style.display = 'none';
+        if (state.footerText.trim()) {
+          elemFooter.style.display = 'block';
+          elemFooter.style.left = state.footerX + 'px';
+          elemFooter.style.top = state.footerY + 'px';
+          elemFooter.style.width = state.footerW + 'px';
+          renderFooterText.style.display = 'block';
+          renderFooterText.innerHTML = state.footerText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+          renderFooterText.style.fontSize = state.footerFontSize + 'px';
+          renderFooterText.style.color = state.footerColor;
+          renderFooterText.style.textAlign = state.footerAlign;
+        } else {
+          elemFooter.style.display = 'none';
+        }
       }
     }
 
@@ -1336,9 +1540,12 @@ support@example.com | +7 (800) 000-00-00</textarea>
         'emailWidth', 'emailHeight',
         'logoUrl', 'logoWidth', 'logoX', 'logoY',
         'headerText', 'headerFontSize', 'headerColor', 'headerW', 'headerX', 'headerY',
+        'headerSvgUrl', 'headerSvgWidth',
         'bodyText', 'bodyFontSize', 'bodyColor', 'bodyW', 'bodyX', 'bodyY',
+        'bodySvgUrl', 'bodySvgWidth',
         'buttonText', 'buttonUrl', 'buttonBgColor', 'buttonTextColor', 'buttonX', 'buttonY',
-        'footerText', 'footerFontSize', 'footerColor', 'footerW', 'footerX', 'footerY'
+        'footerText', 'footerFontSize', 'footerColor', 'footerW', 'footerX', 'footerY',
+        'footerSvgUrl', 'footerSvgWidth'
       ];
 
       inputIds.forEach(id => {
@@ -1378,6 +1585,11 @@ support@example.com | +7 (800) 000-00-00</textarea>
             }
           });
         }
+      });
+
+      // Синхронизация режимов (Текст vs SVG)
+      ['header', 'body', 'footer'].forEach(prefix => {
+        updateSectionModeUI(prefix);
       });
 
       // Перерисовываем холст
@@ -1508,22 +1720,54 @@ support@example.com | +7 (800) 000-00-00</textarea>
           key: 'header',
           y: state.headerY,
           x: state.headerX,
-          active: !!state.headerText.trim(),
-          html: () => `
+          active: state.headerMode === 'svg' ? !!state.headerSvgUrl : !!state.headerText.trim(),
+          html: () => {
+            if (state.headerMode === 'svg' && state.headerSvgUrl) {
+              const w = state.headerSvgWidth || 540;
+              return `
+            <tr>
+              <td style="padding-left: ${state.headerX}px; padding-right: 20px;">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse: collapse;">
+                  <tr>
+                    <td>
+                      <img src="${state.headerSvgUrl}" alt="Заголовок" width="${w}" style="display: block; width: ${w}px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`;
+            }
+            return `
             <tr>
               <td style="padding-left: ${state.headerX}px; padding-right: ${Math.max(15, state.emailWidth - state.headerX - state.headerW)}px; text-align: ${state.headerAlign};">
                 <h1 style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: ${state.headerFontSize}px; line-height: 1.25; color: ${state.headerColor}; font-weight: 700; text-align: ${state.headerAlign};">
                   ${state.headerText}
                 </h1>
               </td>
-            </tr>`
+            </tr>`;
+          }
         },
         {
           key: 'body',
           y: state.bodyY,
           x: state.bodyX,
-          active: !!state.bodyText.trim(),
+          active: state.bodyMode === 'svg' ? !!state.bodySvgUrl : !!state.bodyText.trim(),
           html: () => {
+            if (state.bodyMode === 'svg' && state.bodySvgUrl) {
+              const w = state.bodySvgWidth || 540;
+              return `
+            <tr>
+              <td style="padding-left: ${state.bodyX}px; padding-right: 20px;">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse: collapse;">
+                  <tr>
+                    <td>
+                      <img src="${state.bodySvgUrl}" alt="Основной текст" width="${w}" style="display: block; width: ${w}px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`;
+            }
             const formatted = state.bodyText
               .replace(/&/g, '&amp;')
               .replace(/</g, '&lt;')
@@ -1564,8 +1808,23 @@ support@example.com | +7 (800) 000-00-00</textarea>
           key: 'footer',
           y: state.footerY,
           x: state.footerX,
-          active: !!state.footerText.trim(),
+          active: state.footerMode === 'svg' ? !!state.footerSvgUrl : !!state.footerText.trim(),
           html: () => {
+            if (state.footerMode === 'svg' && state.footerSvgUrl) {
+              const w = state.footerSvgWidth || 540;
+              return `
+            <tr>
+              <td style="padding-left: ${state.footerX}px; padding-right: 20px;">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse: collapse;">
+                  <tr>
+                    <td>
+                      <img src="${state.footerSvgUrl}" alt="Подпись" width="${w}" style="display: block; width: ${w}px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`;
+            }
             const formatted = state.footerText
               .replace(/&/g, '&amp;')
               .replace(/</g, '&lt;')
@@ -1818,9 +2077,12 @@ support@example.com | +7 (800) 000-00-00</textarea>
         'emailWidth', 'emailHeight',
         'logoWidth', 'logoX', 'logoY',
         'headerText', 'headerFontSize', 'headerW', 'headerX', 'headerY',
+        'headerSvgWidth',
         'bodyText', 'bodyFontSize', 'bodyW', 'bodyX', 'bodyY',
+        'bodySvgWidth',
         'buttonText', 'buttonUrl', 'buttonX', 'buttonY',
-        'footerText', 'footerFontSize', 'footerW', 'footerX', 'footerY'
+        'footerText', 'footerFontSize', 'footerW', 'footerX', 'footerY',
+        'footerSvgWidth'
       ];
 
       simpleInputs.forEach(id => {
@@ -1832,6 +2094,104 @@ support@example.com | +7 (800) 000-00-00</textarea>
           updateCanvas();
         });
       });
+
+      // Настройка переключателей режимов (Текст / SVG)
+      ['header', 'body', 'footer'].forEach(prefix => {
+        const cap = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+        const btnText = document.getElementById('btn' + cap + 'ModeText');
+        const btnSvg = document.getElementById('btn' + cap + 'ModeSvg');
+        if (btnText) {
+          btnText.addEventListener('click', () => {
+            state[prefix + 'Mode'] = 'text';
+            updateSectionModeUI(prefix);
+            updateCanvas();
+          });
+        }
+        if (btnSvg) {
+          btnSvg.addEventListener('click', () => {
+            state[prefix + 'Mode'] = 'svg';
+            updateSectionModeUI(prefix);
+            updateCanvas();
+          });
+        }
+      });
+
+      // Настройка загрузчиков SVG файлов и ссылок для заголовка, текста и подписи
+      function setupSvgUploader(prefix) {
+        const cap = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+        const urlInput = document.getElementById(prefix + 'SvgUrl');
+        const statusEl = document.getElementById(prefix + 'SvgStatusText');
+        const clearBtn = document.getElementById('btnClear' + cap + 'Svg');
+        const fileInput = document.getElementById(prefix + 'SvgFileInput');
+        const stateProp = prefix + 'SvgUrl';
+
+        let debounceTimer;
+        if (urlInput) {
+          urlInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+              state[stateProp] = await processImageUrl(e.target.value, statusEl);
+              state[prefix + 'Mode'] = 'svg';
+              updateSectionModeUI(prefix);
+              updateCanvas();
+            }, 500);
+          });
+        }
+
+        if (clearBtn) {
+          clearBtn.addEventListener('click', () => {
+            if (urlInput) urlInput.value = '';
+            state[stateProp] = '';
+            if (statusEl) statusEl.style.display = 'none';
+            updateCanvas();
+          });
+        }
+
+        if (fileInput) {
+          fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (statusEl) {
+              statusEl.style.display = 'block';
+              statusEl.textContent = 'Обработка SVG...';
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+              const dataUrl = event.target.result;
+              state[stateProp] = dataUrl;
+              state[prefix + 'Mode'] = 'svg';
+              updateSectionModeUI(prefix);
+              if (urlInput) urlInput.value = '(файл: ' + file.name + ')';
+              updateCanvas();
+
+              try {
+                const res = await fetch('/api/upload', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ data: dataUrl, filename: file.name })
+                });
+                const json = await res.json();
+                if (json.success && json.url) {
+                  state[stateProp] = json.url;
+                  updateCanvas();
+                  if (statusEl) {
+                    statusEl.textContent = 'SVG успешно загружен!';
+                    setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 2500);
+                  }
+                }
+              } catch (err) {
+                console.warn('SVG сохранен в dataUrl:', err);
+                if (statusEl) statusEl.style.display = 'none';
+              }
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+      }
+
+      ['header', 'body', 'footer'].forEach(p => setupSvgUploader(p));
 
       // Переключатели выравнивания
       document.querySelectorAll('.align-selector').forEach(selector => {

@@ -20,6 +20,7 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 
 // ==================== MIDDLEWARE ====================
+app.disable('x-powered-by');
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
@@ -47,26 +48,6 @@ function authMiddleware(req, res, next) {
   } catch (err) {
     return res.status(401).json({ error: 'Недействительный или истекший JWT токен: ' + err.message });
   }
-}
-
-// Опциональный аутентификатор (для чтения публичных данных)
-function optionalAuthMiddleware(req, res, next) {
-  let token = null;
-  const authHeader = req.headers['authorization'];
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7);
-  } else if (req.cookies && req.cookies.token) {
-    token = req.cookies.token;
-  }
-
-  if (token) {
-    try {
-      req.user = jwt.verify(token, JWT_SECRET);
-    } catch (e) {
-      req.user = null;
-    }
-  }
-  next();
 }
 
 // ==================== REST API: AUTH (JWT) ====================
@@ -370,6 +351,13 @@ app.use(express.static(__dirname, {
 // 404 обработчик
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'landing.html'));
+});
+
+// Глобальный обработчик ошибок
+app.use((err, req, res, next) => {
+  console.error('[Server Error]', err.message);
+  if (res.headersSent) return next(err);
+  res.status(err.status || 500).json({ error: err.message || 'Внутренняя ошибка сервера' });
 });
 
 // Запуск сервера

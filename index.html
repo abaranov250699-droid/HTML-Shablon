@@ -971,7 +971,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
           
           <!-- Элемент: Логотип -->
           <div class="draggable-element" id="elem-logo" data-key="logo" style="left: 30px; top: 40px;">
-            <div class="element-drag-handle">🖼️ Логотип (перетащите)</div>
+            <div class="element-drag-handle">Логотип (перетащите)</div>
             <img id="renderLogoImg" src="https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY" alt="Logo" style="display: block; width: 160px; max-width: 100%; height: auto; pointer-events: none;">
           </div>
 
@@ -993,7 +993,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
 
           <!-- Элемент: Кнопка CTA -->
           <div class="draggable-element" id="elem-button" data-key="button" style="left: 30px; top: 440px;">
-            <div class="element-drag-handle">🔘 Кнопка (перетащите)</div>
+            <div class="element-drag-handle">Кнопка (перетащите)</div>
             <a id="renderButtonLink" href="#" style="font-size: 15px; font-weight: 600; color: #ffffff; background-color: #3b82f6; text-decoration: none; padding: 12px 28px; border-radius: 6px; display: inline-block; pointer-events: none;">
               Перейти в личный кабинет
             </a>
@@ -1001,7 +1001,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
 
           <!-- Элемент: Подпись -->
           <div class="draggable-element" id="elem-footer" data-key="footer" style="left: 30px; top: 530px; width: 540px;">
-            <div class="element-drag-handle">✍️ Подпись (перетащите)</div>
+            <div class="element-drag-handle">Подпись (перетащите)</div>
             <div id="renderFooterText" style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 13px; line-height: 1.5; color: #64748b; pointer-events: none;">
               С уважением,<br>Команда клиентского сервиса
             </div>
@@ -1038,7 +1038,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
         <button class="modal-close" id="authModalClose">&times;</button>
       </div>
       <div class="modal-body" style="padding: 24px;">
-        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #0b1322; padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #f4f4f0; padding: 4px; border: 1px solid var(--border-color);">
           <button class="tab-btn active" id="tabAuthLogin" style="flex: 1; padding: 8px;">Вход</button>
           <button class="tab-btn" id="tabAuthRegister" style="flex: 1; padding: 8px;">Регистрация</button>
         </div>
@@ -1050,7 +1050,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
           </div>
           <div class="form-group" style="margin-bottom: 18px;">
             <label>Пароль</label>
-            <input type="password" id="authPassword" placeholder="Ваш пароль" autocomplete="current-password" required style="width: 100%; background-color: #0b1322; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; outline: none;">
+            <input type="password" id="authPassword" placeholder="Ваш пароль" autocomplete="current-password" required style="width: 100%; background-color: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; font-size: 0.9rem; outline: none;">
           </div>
           <div id="authErrorMsg" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 14px; display: none;"></div>
           <button type="submit" class="btn btn-primary" id="btnAuthSubmit" style="width: 100%; justify-content: center; padding: 10px;">Войти</button>
@@ -1063,7 +1063,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
   <div class="modal-overlay" id="templatesModal">
     <div class="modal-content" style="max-width: 650px;">
       <div class="modal-header">
-        <h3>📂 Мои сохранённые шаблоны</h3>
+        <h3>Мои сохранённые шаблоны</h3>
         <button class="modal-close" id="templatesModalClose">&times;</button>
       </div>
       <div class="modal-body" style="padding: 20px; max-height: 60vh; overflow-y: auto;">
@@ -1081,7 +1081,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
   <div class="modal-overlay" id="presetsModal">
     <div class="modal-content" style="max-width: 900px;">
       <div class="modal-header">
-        <h3>🎨 Готовые шаблоны писем</h3>
+        <h3>Готовые шаблоны писем</h3>
         <button class="modal-close" id="presetsModalClose">&times;</button>
       </div>
       <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
@@ -1102,7 +1102,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
   <div class="modal-overlay" id="saveModal">
     <div class="modal-content" style="max-width: 440px;">
       <div class="modal-header">
-        <h3>💾 Сохранить шаблон письма</h3>
+        <h3>Сохранить шаблон письма</h3>
         <button class="modal-close" id="saveModalClose">&times;</button>
       </div>
       <div class="modal-body" style="padding: 20px;">
@@ -1643,7 +1643,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
 
       if (statusElement) {
         statusElement.style.display = 'block';
-        statusElement.textContent = '⏳ Скачиваем и обрабатываем изображение...';
+        statusElement.textContent = 'Обработка изображения...';
       }
 
       try {
@@ -1656,19 +1656,19 @@ support@example.com | +7 (800) 000-00-00</textarea>
         
         if (data.success && (data.base64 || data.url)) {
           if (statusElement) {
-            statusElement.textContent = '✅ Изображение успешно загружено!';
+            statusElement.textContent = 'Изображение успешно загружено';
             setTimeout(() => { statusElement.style.display = 'none'; }, 3000);
           }
           return data.base64 || data.url;
         } else {
           if (statusElement) {
-            statusElement.textContent = '❌ ' + (data.error || 'Не удалось загрузить изображение');
+            statusElement.textContent = data.error || 'Не удалось загрузить изображение';
           }
           return cleanUrl;
         }
       } catch (e) {
         if (statusElement) {
-          statusElement.textContent = '❌ Ошибка сети: ' + e.message;
+          statusElement.textContent = 'Ошибка сети: ' + e.message;
         }
         return cleanUrl;
       }

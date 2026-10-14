@@ -347,11 +347,8 @@ app.get('/api/health', (req, res) => {
 // ==================== РАЗДАЧА СТАТИЧЕСКИХ ФАЙЛОВ И РОУТИНГ ====================
 
 app.use('/uploads', express.static(UPLOADS_DIR));
-app.use(express.static(__dirname, {
-  extensions: ['html', 'htm']
-}));
 
-// Главные страницы сервиса
+// Главные страницы сервиса (строгий приоритет перед статикой)
 app.get(['/', '/landing'], (req, res) => {
   res.sendFile(path.join(__dirname, 'landing.html'));
 });
@@ -363,6 +360,12 @@ app.get('/templates', (req, res) => {
 app.get(['/editor', '/editor.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+// Статические файлы (js, css, картинки) БЕЗ автоматической раздачи index.html на корень
+app.use(express.static(__dirname, {
+  index: false,
+  extensions: ['html', 'htm']
+}));
 
 // 404 обработчик
 app.use((req, res) => {

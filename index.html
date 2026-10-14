@@ -489,6 +489,26 @@
       transform: translateY(0);
     }
 
+    /* Обязательная авторизация для работы с конструктором */
+    body.auth-locked .main-layout {
+      filter: blur(5px) grayscale(50%);
+      pointer-events: none !important;
+      user-select: none !important;
+    }
+    body.auth-locked header .header-actions button:not(#btnOpenAuth),
+    body.auth-locked header .header-actions a:not(.allow-unauth) {
+      pointer-events: none !important;
+      opacity: 0.35;
+    }
+    #authModal.mandatory-auth {
+      background: rgba(10, 10, 10, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+    }
+    #authModal.mandatory-auth #authModalClose {
+      display: none !important;
+    }
+
     /* Стили для системы авторизации и шаблонов */
     .user-badge {
       display: flex;
@@ -627,13 +647,16 @@
       Шаблонизатор HTML Писем (Drag & Drop)
     </h1>
     <div class="header-actions">
-      <!-- Возврат в каталог готовых шаблонов -->
-      <a href="/templates.html" class="btn btn-secondary" style="text-decoration: none;">
+      <!-- Возврат на главную и в каталог -->
+      <a href="/" class="btn btn-secondary allow-unauth" style="text-decoration: none;" title="На главную">
+        Главная
+      </a>
+      <a href="/templates.html" class="btn btn-secondary allow-unauth" style="text-decoration: none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        ← К готовым шаблонам
+        Каталог
       </a>
 
       <!-- Кнопка галереи предзаготовленных шаблонов -->
@@ -1032,12 +1055,16 @@ support@example.com | +7 (800) 000-00-00</textarea>
 
   <!-- Модальное окно авторизации (Вход / Регистрация) -->
   <div class="modal-overlay" id="authModal">
-    <div class="modal-content" style="max-width: 420px;">
+    <div class="modal-content" style="max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.4);">
       <div class="modal-header">
-        <h3 id="authModalTitle">Вход в аккаунт</h3>
+        <h3 id="authModalTitle">Вход в конструктор</h3>
         <button class="modal-close" id="authModalClose">&times;</button>
       </div>
       <div class="modal-body" style="padding: 24px;">
+        <div id="authMandatoryNotice" style="background: #fafaf8; border-left: 3px solid #0a0a0a; border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 12px 14px; margin-bottom: 18px; font-size: 0.82rem; line-height: 1.45; color: #404040;">
+          <strong>Авторизация обязательна:</strong> Для доступа к редактору и инструментам создания писем войдите в аккаунт или зарегистрируйтесь. Все ваши макеты будут изолированы и защищены в облачной базе данных.
+        </div>
+
         <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #f4f4f0; padding: 4px; border: 1px solid var(--border-color);">
           <button class="tab-btn active" id="tabAuthLogin" style="flex: 1; padding: 8px;">Вход</button>
           <button class="tab-btn" id="tabAuthRegister" style="flex: 1; padding: 8px;">Регистрация</button>
@@ -1055,6 +1082,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
           <div id="authErrorMsg" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 14px; display: none;"></div>
           <button type="submit" class="btn btn-primary" id="btnAuthSubmit" style="width: 100%; justify-content: center; padding: 10px;">Войти</button>
         </form>
+
+        <div style="margin-top: 18px; text-align: center; border-top: 1px solid var(--border-color); padding-top: 14px;">
+          <a href="/" style="font-size: 0.82rem; color: var(--text-muted); text-decoration: underline;">← Вернуться на главную страницу</a>
+        </div>
       </div>
     </div>
   </div>
@@ -1907,6 +1938,22 @@ support@example.com | +7 (800) 000-00-00</textarea>
         authErrorMsg.style.display = 'none';
       });
 
+      function lockEditor(isMandatory = true) {
+        document.body.classList.add('auth-locked');
+        if (isMandatory) {
+          authModal.classList.add('open', 'mandatory-auth');
+          const notice = document.getElementById('authMandatoryNotice');
+          if (notice) notice.style.display = 'block';
+        }
+      }
+
+      function unlockEditor() {
+        document.body.classList.remove('auth-locked');
+        authModal.classList.remove('open', 'mandatory-auth');
+        const notice = document.getElementById('authMandatoryNotice');
+        if (notice) notice.style.display = 'none';
+      }
+
       btnOpenAuth.addEventListener('click', () => {
         authModal.classList.add('open');
         authUsername.value = '';
@@ -1914,14 +1961,27 @@ support@example.com | +7 (800) 000-00-00</textarea>
         authErrorMsg.style.display = 'none';
       });
 
-      authModalClose.addEventListener('click', () => authModal.classList.remove('open'));
-      authModal.addEventListener('click', (e) => { if (e.target === authModal) authModal.classList.remove('open'); });
+      authModalClose.addEventListener('click', () => {
+        if (authModal.classList.contains('mandatory-auth')) return;
+        authModal.classList.remove('open');
+      });
+
+      authModal.addEventListener('click', (e) => {
+        if (authModal.classList.contains('mandatory-auth')) return;
+        if (e.target === authModal) authModal.classList.remove('open');
+      });
 
       // Отправка формы авторизации
       authForm.addEventListener('submit', async () => {
         const username = authUsername.value.trim();
         const password = authPassword.value;
         authErrorMsg.style.display = 'none';
+
+        if (!username || !password) {
+          authErrorMsg.textContent = 'Укажите логин и пароль';
+          authErrorMsg.style.display = 'block';
+          return;
+        }
 
         const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
 
@@ -1943,8 +2003,8 @@ support@example.com | +7 (800) 000-00-00</textarea>
           localStorage.setItem('email_builder_token', data.token);
           currentUser = data.user;
           updateUserUI();
-          authModal.classList.remove('open');
-          showToast(`Добро пожаловать, ${currentUser.username}!`);
+          unlockEditor();
+          showToast(`Добро пожаловать, ${currentUser.username}! Доступ к конструктору открыт.`);
         } catch (err) {
           authErrorMsg.textContent = 'Ошибка сети: ' + err.message;
           authErrorMsg.style.display = 'block';
@@ -1978,13 +2038,17 @@ support@example.com | +7 (800) 000-00-00</textarea>
         currentUser = null;
         currentTemplateId = null;
         updateUserUI();
-        showToast('Вы успешно вышли из аккаунта');
+        lockEditor(true);
+        showToast('Вы вышли из аккаунта. Конструктор заблокирован.');
       });
 
       // Проверка сессии при старте
       async function checkCurrentSession() {
         const token = localStorage.getItem('email_builder_token');
-        if (!token) return;
+        if (!token) {
+          lockEditor(true);
+          return;
+        }
 
         try {
           const res = await fetch('/api/auth/me', {
@@ -1994,11 +2058,18 @@ support@example.com | +7 (800) 000-00-00</textarea>
           if (data.authenticated && data.user) {
             currentUser = data.user;
             updateUserUI();
+            unlockEditor();
           } else {
             localStorage.removeItem('email_builder_token');
+            currentUser = null;
+            updateUserUI();
+            lockEditor(true);
           }
         } catch (e) {
           console.error(e);
+          if (!currentUser) {
+            lockEditor(true);
+          }
         }
       }
 

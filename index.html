@@ -765,7 +765,7 @@
         <div class="form-group">
           <label>Ссылка на логотип (URL или Яндекс.Диск)</label>
           <div style="display: flex; gap: 6px;">
-            <input type="text" id="logoUrl" placeholder="https://..." value="https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY" style="flex: 1;">
+            <input type="text" id="logoUrl" placeholder="https://..." value="" style="flex: 1;">
             <button class="btn btn-secondary" id="btnClearLogo" title="Удалить логотип" style="padding: 6px 12px; font-size: 1rem; line-height: 1;">&times;</button>
           </div>
           <div class="upload-btn-wrap">
@@ -1163,7 +1163,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
       emailHeight: 1200,
 
       // Логотип
-      logoUrl: 'https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY',
+      logoUrl: '',
       logoWidth: 160,
       logoX: 30,
       logoY: 40,
@@ -2004,6 +2004,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
           currentUser = data.user;
           updateUserUI();
           unlockEditor();
+          resetInactivityTimer();
           showToast(`Добро пожаловать, ${currentUser.username}! Доступ к конструктору открыт.`);
         } catch (err) {
           authErrorMsg.textContent = 'Ошибка сети: ' + err.message;
@@ -2023,8 +2024,82 @@ support@example.com | +7 (800) 000-00-00</textarea>
         }
       }
 
+      // ==================== КОНТРОЛЬ НЕАКТИВНОСТИ СЕССИИ (10 МИНУТ) ====================
+      const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000; // 10 минут
+      let inactivityTimer = null;
+      let lastActivityThrottle = 0;
+
+      function resetInactivityTimer() {
+        if (!currentUser) return;
+        const now = Date.now();
+        if (now - lastActivityThrottle > 2000) {
+          lastActivityThrottle = now;
+          try {
+            localStorage.setItem('email_builder_last_activity', now.toString());
+          } catch (e) {}
+        }
+
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(handleInactivityTimeout, INACTIVITY_TIMEOUT_MS);
+      }
+
+      function handleInactivityTimeout() {
+        if (!currentUser && !localStorage.getItem('email_builder_token')) return;
+
+        console.warn('Сессия сброшена из-за 10 минут отсутствия активности');
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+
+        const token = localStorage.getItem('email_builder_token');
+        if (token) {
+          try {
+            fetch('/api/auth/logout', {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + token }
+            }).catch(() => {});
+          } catch (e) {}
+        }
+
+        localStorage.removeItem('email_builder_token');
+        localStorage.removeItem('email_builder_last_activity');
+        currentUser = null;
+        currentTemplateId = null;
+        updateUserUI();
+        lockEditor(true);
+
+        const notice = document.getElementById('authMandatoryNotice');
+        if (notice) {
+          notice.innerHTML = '<strong>Сессия завершена:</strong> Прошло 10 минут бездействия. В целях безопасности сессия была автоматически сброшена. Пожалуйста, выполните вход снова.';
+          notice.style.display = 'block';
+        }
+        showToast('Сессия завершена из-за неактивности (10 мин)');
+      }
+
+      // Регистрация событий активности пользователя
+      ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'input', 'click'].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (currentUser) resetInactivityTimer();
+        }, { passive: true });
+      });
+
+      // Периодическая проверка неактивности
+      function checkStoredInactivity() {
+        if (!currentUser) return;
+        const last = parseInt(localStorage.getItem('email_builder_last_activity') || '0', 10);
+        if (last && (Date.now() - last >= INACTIVITY_TIMEOUT_MS)) {
+          handleInactivityTimeout();
+        }
+      }
+
+      setInterval(checkStoredInactivity, 10000);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && currentUser) {
+          checkStoredInactivity();
+        }
+      });
+
       // Выход
       btnLogout.addEventListener('click', async () => {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
         const token = localStorage.getItem('email_builder_token');
         if (token) {
           try {
@@ -2035,6 +2110,7 @@ support@example.com | +7 (800) 000-00-00</textarea>
           } catch (e) {}
         }
         localStorage.removeItem('email_builder_token');
+        localStorage.removeItem('email_builder_last_activity');
         currentUser = null;
         currentTemplateId = null;
         updateUserUI();
@@ -2050,6 +2126,13 @@ support@example.com | +7 (800) 000-00-00</textarea>
           return;
         }
 
+        // Проверка времени последней активности (10 минут)
+        const lastActivity = parseInt(localStorage.getItem('email_builder_last_activity') || '0', 10);
+        if (lastActivity && (Date.now() - lastActivity >= INACTIVITY_TIMEOUT_MS)) {
+          handleInactivityTimeout();
+          return;
+        }
+
         try {
           const res = await fetch('/api/auth/me', {
             headers: { 'Authorization': 'Bearer ' + token }
@@ -2059,8 +2142,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
             currentUser = data.user;
             updateUserUI();
             unlockEditor();
+            resetInactivityTimer();
           } else {
             localStorage.removeItem('email_builder_token');
+            localStorage.removeItem('email_builder_last_activity');
             currentUser = null;
             updateUserUI();
             lockEditor(true);

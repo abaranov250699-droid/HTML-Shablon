@@ -1079,6 +1079,12 @@ support@example.com | +7 (800) 000-00-00</textarea>
             <label>Пароль</label>
             <input type="password" id="authPassword" placeholder="Ваш пароль" autocomplete="current-password" required style="width: 100%; background-color: #ffffff; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; font-size: 0.9rem; outline: none;">
           </div>
+          <div id="authConsentGroup" style="margin-bottom: 18px; display: none; align-items: flex-start; gap: 8px;">
+            <input type="checkbox" id="authPrivacyConsent" style="margin-top: 3px; cursor: pointer;">
+            <label for="authPrivacyConsent" style="font-size: 0.8rem; line-height: 1.45; color: var(--text-main); cursor: pointer; user-select: none;">
+              Я ознакомился с политикой обработки <a href="/privacy-policy.pdf" download="Политика_обработки_персональных_данных.pdf" target="_blank" style="color: #1e50ff; text-decoration: underline; font-weight: 600;">персональных данных</a>
+            </label>
+          </div>
           <div id="authErrorMsg" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 14px; display: none;"></div>
           <button type="submit" class="btn btn-primary" id="btnAuthSubmit" style="width: 100%; justify-content: center; padding: 10px;">Войти</button>
         </form>
@@ -1919,13 +1925,17 @@ support@example.com | +7 (800) 000-00-00</textarea>
       const templatesModalCloseBtn = document.getElementById('templatesModalCloseBtn');
       const templatesListContainer = document.getElementById('templatesListContainer');
 
+      const authConsentGroup = document.getElementById('authConsentGroup');
+      const authPrivacyConsent = document.getElementById('authPrivacyConsent');
+
       // Переключение вкладок вход/регистрация
       tabAuthLogin.addEventListener('click', () => {
         authMode = 'login';
         tabAuthLogin.classList.add('active');
         tabAuthRegister.classList.remove('active');
-        authModalTitle.textContent = 'Вход в аккаунт';
+        authModalTitle.textContent = 'Вход в конструктор';
         btnAuthSubmit.textContent = 'Войти';
+        if (authConsentGroup) authConsentGroup.style.display = 'none';
         authErrorMsg.style.display = 'none';
       });
 
@@ -1935,6 +1945,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
         tabAuthLogin.classList.remove('active');
         authModalTitle.textContent = 'Регистрация аккаунта';
         btnAuthSubmit.textContent = 'Зарегистрироваться';
+        if (authConsentGroup) {
+          authConsentGroup.style.display = 'flex';
+          if (authPrivacyConsent) authPrivacyConsent.checked = false;
+        }
         authErrorMsg.style.display = 'none';
       });
 
@@ -1958,6 +1972,10 @@ support@example.com | +7 (800) 000-00-00</textarea>
         authModal.classList.add('open');
         authUsername.value = '';
         authPassword.value = '';
+        if (authPrivacyConsent) authPrivacyConsent.checked = false;
+        if (authConsentGroup) {
+          authConsentGroup.style.display = authMode === 'register' ? 'flex' : 'none';
+        }
         authErrorMsg.style.display = 'none';
       });
 
@@ -1983,13 +2001,24 @@ support@example.com | +7 (800) 000-00-00</textarea>
           return;
         }
 
+        if (authMode === 'register' && (!authPrivacyConsent || !authPrivacyConsent.checked)) {
+          authErrorMsg.textContent = 'Необходимо подтвердить ознакомление с политикой обработки персональных данных';
+          authErrorMsg.style.display = 'block';
+          return;
+        }
+
         const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
 
         try {
+          const payload = { username, password };
+          if (authMode === 'register') {
+            payload.privacyAccepted = authPrivacyConsent.checked;
+          }
+
           const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify(payload)
           });
           const data = await res.json();
 

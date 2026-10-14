@@ -75,16 +75,17 @@ async function withTenantClient(tenantId, callback) {
 // ==================== РЕАЛИЗАЦИЯ POSTGRESQL ====================
 
 // Регистрация
-async function registerUserPg(username, password, tenantId) {
+async function registerUserPg(username, password, tenantId, privacyAccepted = true) {
   const cleanUsername = username.trim().toLowerCase();
   const assignedTenantId = tenantId || `tenant_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const passwordHash = await bcrypt.hash(password, 10);
+  const now = new Date();
 
   const res = await pool.query(
-    `INSERT INTO users (username, password_hash, tenant_id)
-     VALUES ($1, $2, $3)
-     RETURNING id, username, tenant_id, created_at`,
-    [cleanUsername, passwordHash, assignedTenantId]
+    `INSERT INTO users (username, password_hash, tenant_id, privacy_accepted, privacy_accepted_at)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id, username, tenant_id, privacy_accepted, privacy_accepted_at, created_at`,
+    [cleanUsername, passwordHash, assignedTenantId, !!privacyAccepted, now]
   );
   return res.rows[0];
 }
@@ -93,7 +94,7 @@ async function registerUserPg(username, password, tenantId) {
 async function loginUserPg(username, password) {
   const cleanUsername = username.trim().toLowerCase();
   const res = await pool.query(
-    `SELECT id, username, password_hash, tenant_id FROM users WHERE username = $1`,
+    `SELECT id, username, password_hash, tenant_id, privacy_accepted, privacy_accepted_at FROM users WHERE username = $1`,
     [cleanUsername]
   );
   const user = res.rows[0];
@@ -102,7 +103,13 @@ async function loginUserPg(username, password) {
   const match = await bcrypt.compare(password, user.password_hash);
   if (!match) throw new Error('Неверный логин или пароль');
 
-  return { id: user.id, username: user.username, tenantId: user.tenant_id };
+  return {
+    id: user.id,
+    username: user.username,
+    tenantId: user.tenant_id,
+    privacyAccepted: user.privacy_accepted,
+    privacyAcceptedAt: user.privacy_accepted_at
+  };
 }
 
 // Шаблоны с RLS
@@ -188,7 +195,7 @@ function saveLocalTemplates(tpls) {
   fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(tpls, null, 2), 'utf8');
 }
 
-async function registerUserLocal(username, password, tenantId) {
+async function registerUserLocal(username, password, tenantId, privacyAccepted = true) {
   const users = getLocalUsers();
   const cleanUsername = username.trim().toLowerCase();
   if (users.find(u => u.username === cleanUsername)) {
@@ -200,11 +207,19 @@ async function registerUserLocal(username, password, tenantId) {
     username: cleanUsername,
     passwordHash,
     tenantId: tenantId || `tenant_${Date.now()}`,
+    privacyAccepted: !!privacyAccepted,
+    privacyAcceptedAt: new Date().toISOString(),
     createdAt: new Date().toISOString()
   };
   users.push(newUser);
   saveLocalUsers(users);
-  return { id: newUser.id, username: newUser.username, tenantId: newUser.tenantId };
+  return {
+    id: newUser.id,
+    username: newUser.username,
+    tenantId: newUser.tenantId,
+    privacyAccepted: newUser.privacyAccepted,
+    privacyAcceptedAt: newUser.privacyAcceptedAt
+  };
 }
 
 async function loginUserLocal(username, password) {
@@ -214,7 +229,13 @@ async function loginUserLocal(username, password) {
   if (!user) throw new Error('Неверный логин или пароль');
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) throw new Error('Неверный логин или пароль');
-  return { id: user.id, username: user.username, tenantId: user.tenantId || `tenant_${user.id}` };
+  return {
+    id: user.id,
+    username: user.username,
+    tenantId: user.tenantId || `tenant_${user.id}`,
+    privacyAccepted: user.privacyAccepted ?? true,
+    privacyAcceptedAt: user.privacyAcceptedAt || null
+  };
 }
 
 function getUserTemplatesLocal(tenantId) {
@@ -266,7 +287,7 @@ function deleteTemplateLocal(tenantId, templateId) {
 // ==================== УНИФИЦИРОВАННЫЙ ЭКСПОРТ ====================
 module.exports = {
   isPostgres: () => isPostgres,
-  registerUser: (u, p, t) => isPostgres ? registerUserPg(u, p, t) : registerUserLocal(u, p, t),
+  registerUser: (u, p, t, a) => isPostgres ? registerUserPg(u, p, t, a) : registerUserLocal(u, p, t, a),
   loginUser: (u, p) => isPostgres ? loginUserPg(u, p) : loginUserLocal(u, p),
   getUserTemplates: (t) => isPostgres ? getUserTemplatesPg(t) : getUserTemplatesLocal(t),
   saveTemplate: (t, u, d) => isPostgres ? saveTemplatePg(t, u, d) : saveTemplateLocal(t, u, d),

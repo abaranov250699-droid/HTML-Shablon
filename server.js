@@ -55,12 +55,18 @@ function authMiddleware(req, res, next) {
 // Регистрация
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { username, password, tenantId } = req.body;
+    const { username, password, tenantId, privacyAccepted } = req.body;
     if (!username || !password || username.trim().length < 3 || password.length < 4) {
       return res.status(400).json({ error: 'Логин должен быть от 3 символов, пароль от 4 символов' });
     }
 
-    const user = await db.registerUser(username, password, tenantId);
+    if (!privacyAccepted) {
+      return res.status(400).json({
+        error: 'Регистрация невозможна: необходимо подтвердить согласие с политикой обработки персональных данных'
+      });
+    }
+
+    const user = await db.registerUser(username, password, tenantId, privacyAccepted);
 
     // Генерация JWT токена с сессией tenant
     const token = jwt.sign(
@@ -80,7 +86,8 @@ app.post('/api/auth/register', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        tenantId: user.tenant_id || user.tenantId
+        tenantId: user.tenant_id || user.tenantId,
+        privacyAccepted: user.privacy_accepted || user.privacyAccepted
       }
     });
   } catch (err) {
@@ -97,6 +104,13 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const user = await db.loginUser(username, password);
+
+    // Проверка согласия с политикой обработки персональных данных
+    if (user.privacyAccepted === false) {
+      return res.status(403).json({
+        error: 'Вход невозможен: согласие с политикой обработки персональных данных не подтверждено'
+      });
+    }
 
     const token = jwt.sign(
       {
@@ -115,7 +129,8 @@ app.post('/api/auth/login', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        tenantId: user.tenantId
+        tenantId: user.tenantId,
+        privacyAccepted: user.privacyAccepted
       }
     });
   } catch (err) {
@@ -303,6 +318,18 @@ app.get('/templates', (req, res) => {
 
 app.get(['/editor', '/editor.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Политика обработки персональных данных (скачивание документа и онлайн-просмотр)
+app.get('/privacy-policy.pdf', (req, res) => {
+  res.download(
+    path.join(__dirname, 'privacy-policy.pdf'),
+    'Политика_обработки_персональных_данных.pdf'
+  );
+});
+
+app.get(['/privacy', '/privacy/'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'privacy-policy.pdf'));
 });
 
 // Статические файлы (js, css, картинки) с кэшированием и без автоматической раздачи index.html на корень

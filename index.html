@@ -737,7 +737,7 @@
           <label>URL фонового изображения</label>
           <div style="display: flex; gap: 6px;">
             <input type="text" id="bgImageUrl" placeholder="https://... (прямая ссылка или Яндекс.Диск)" style="flex: 1;">
-            <button class="btn btn-secondary" id="btnClearBg" title="Удалить фон" style="padding: 6px 12px; font-size: 0.8rem;">✕</button>
+            <button class="btn btn-secondary" id="btnClearBg" title="Удалить фон" style="padding: 6px 12px; font-size: 1rem; line-height: 1;">&times;</button>
           </div>
           <div class="upload-btn-wrap">
             <label class="btn-file" for="bgFileInput">Загрузить фон с компьютера</label>
@@ -766,7 +766,7 @@
           <label>Ссылка на логотип (URL или Яндекс.Диск)</label>
           <div style="display: flex; gap: 6px;">
             <input type="text" id="logoUrl" placeholder="https://..." value="https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY" style="flex: 1;">
-            <button class="btn btn-secondary" id="btnClearLogo" title="Удалить логотип" style="padding: 6px 12px; font-size: 0.8rem;">✕</button>
+            <button class="btn btn-secondary" id="btnClearLogo" title="Удалить логотип" style="padding: 6px 12px; font-size: 1rem; line-height: 1;">&times;</button>
           </div>
           <div class="upload-btn-wrap">
             <label class="btn-file" for="logoFileInput">Загрузить логотип с компьютера</label>
@@ -2155,7 +2155,9 @@ support@example.com | +7 (800) 000-00-00</textarea>
               </div>
               <div class="template-actions">
                 <button class="btn btn-primary btn-load-tpl" style="padding: 6px 12px; font-size: 0.8rem;">Загрузить</button>
-                <button class="btn btn-secondary btn-del-tpl" style="padding: 6px 10px; font-size: 0.8rem; color: #ef4444;" title="Удалить">✕</button>
+                <button class="btn btn-secondary btn-del-tpl" style="padding: 6px 10px; color: #ef4444; display: inline-flex; align-items: center;" title="Удалить">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
               </div>
             `;
 

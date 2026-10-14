@@ -167,34 +167,7 @@ async function deleteTemplatePg(tenantId, templateId) {
   });
 }
 
-// REST API для расширенных бизнес-модулей (виджеты, менеджеры, сделки, платежи)
-async function getCustomWidgetsPg(tenantId) {
-  return withTenantClient(tenantId, async (client) => {
-    const res = await client.query(`SELECT * FROM custom_widgets ORDER BY created_at DESC`);
-    return res.rows;
-  });
-}
 
-async function getManagersPg(tenantId) {
-  return withTenantClient(tenantId, async (client) => {
-    const res = await client.query(`SELECT * FROM managers ORDER BY created_at DESC`);
-    return res.rows;
-  });
-}
-
-async function getDealsPg(tenantId) {
-  return withTenantClient(tenantId, async (client) => {
-    const res = await client.query(`SELECT * FROM deals ORDER BY created_at DESC`);
-    return res.rows;
-  });
-}
-
-async function getPaymentsPg(tenantId) {
-  return withTenantClient(tenantId, async (client) => {
-    const res = await client.query(`SELECT * FROM payments ORDER BY paid_at DESC`);
-    return res.rows;
-  });
-}
 
 // ==================== ЛОКАЛЬНЫЙ РЕЗЕРВНЫЙ АДАПТЕР (FALLBACK) ====================
 const DATA_DIR = path.join(__dirname, 'data');
@@ -297,9 +270,5 @@ module.exports = {
   loginUser: (u, p) => isPostgres ? loginUserPg(u, p) : loginUserLocal(u, p),
   getUserTemplates: (t) => isPostgres ? getUserTemplatesPg(t) : getUserTemplatesLocal(t),
   saveTemplate: (t, u, d) => isPostgres ? saveTemplatePg(t, u, d) : saveTemplateLocal(t, u, d),
-  deleteTemplate: (t, id) => isPostgres ? deleteTemplatePg(t, id) : deleteTemplateLocal(t, id),
-  getCustomWidgets: (t) => isPostgres ? getCustomWidgetsPg(t) : Promise.resolve([]),
-  getManagers: (t) => isPostgres ? getManagersPg(t) : Promise.resolve([]),
-  getDeals: (t) => isPostgres ? getDealsPg(t) : Promise.resolve([]),
-  getPayments: (t) => isPostgres ? getPaymentsPg(t) : Promise.resolve([])
+  deleteTemplate: (t, id) => isPostgres ? deleteTemplatePg(t, id) : deleteTemplateLocal(t, id)
 };

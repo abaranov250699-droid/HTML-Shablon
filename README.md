@@ -18,7 +18,7 @@
  │  Платформа: Node.js + Express.js                            │
  │  Репозиторий GitHub: HTML-Shablon (ветка main)              │
  │  CI/CD: Автоматический build & deploy при каждом git push    │
- │  REST API: /api/auth, /api/templates, /api/custom-widgets   │
+ │  REST API: /api/auth, /api/templates, /api/fetch-remote     │
  └──────────────────────────────┬──────────────────────────────┘
                                 │ PostgreSQL Client (pg Pool + SSL)
                                 │ Сессионная изоляция: app.current_tenant
@@ -26,8 +26,8 @@
  ┌─────────────────────────────────────────────────────────────┐
  │                База данных Neon.tech (eu-central-1)         │
  │  Технология: Serverless Cloud PostgreSQL 16+                │
- │  Безопасность: Row Level Security (RLS) на всех таблицах    │
- │  Таблицы: users, templates, custom_widgets, managers, deals │
+ │  Безопасность: Row Level Security (RLS) изоляция арендаторов│
+ │  Таблицы: users, templates                                  │
  └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -84,10 +84,6 @@ npm run db:migrate
 | `GET` | `/api/templates` | JWT (RLS) | Получение списка шаблонов арендатора |
 | `POST` | `/api/templates` | JWT (RLS) | Создание или обновление шаблона письма |
 | `DELETE` | `/api/templates/:id` | JWT (RLS) | Удаление шаблона арендатора |
-| `GET` | `/api/custom-widgets`| JWT (RLS) | Получение кастомных виджетов |
-| `GET` | `/api/managers` | JWT (RLS) | Список ответственных менеджеров |
-| `GET` | `/api/deals` | JWT (RLS) | Список сделок |
-| `GET` | `/api/payments` | JWT (RLS) | Список финансовых операций и платежей |
 | `POST` | `/api/fetch-remote` | Публичный | Проксирование картинок и ссылок Яндекс.Диска |
 
 ---

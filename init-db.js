@@ -34,8 +34,8 @@ async function initDb() {
     await client.query(sql);
 
     console.log('🎉 Схема PostgreSQL успешно развернута!');
-    console.log('   - Таблицы: users, templates, custom_widgets, managers, deals, payments');
-    console.log('   - Политика RLS: app.current_tenant активирована на всех таблицах');
+    console.log('   - Таблицы: users, templates');
+    console.log('   - Политика RLS: tenant_isolation_templates активирована');
 
     client.release();
     await pool.end();

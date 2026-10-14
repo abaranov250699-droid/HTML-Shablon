@@ -174,47 +174,7 @@ app.delete('/api/templates/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// ==================== БИЗНЕС-МОДУЛИ СЕРВИСА ====================
 
-// Кастомные виджеты
-app.get('/api/custom-widgets', authMiddleware, async (req, res) => {
-  try {
-    const widgets = await db.getCustomWidgets(req.user.tenantId);
-    return res.json({ success: true, widgets });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Менеджеры
-app.get('/api/managers', authMiddleware, async (req, res) => {
-  try {
-    const managers = await db.getManagers(req.user.tenantId);
-    return res.json({ success: true, managers });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Сделки
-app.get('/api/deals', authMiddleware, async (req, res) => {
-  try {
-    const deals = await db.getDeals(req.user.tenantId);
-    return res.json({ success: true, deals });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-// Платежи
-app.get('/api/payments', authMiddleware, async (req, res) => {
-  try {
-    const payments = await db.getPayments(req.user.tenantId);
-    return res.json({ success: true, payments });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
 
 // ==================== СКАЧИВАНИЕ ИЗОБРАЖЕНИЙ / PROXY ====================
 
@@ -327,7 +287,10 @@ app.get('/api/health', (req, res) => {
 
 // ==================== РАЗДАЧА СТАТИЧЕСКИХ ФАЙЛОВ И РОУТИНГ ====================
 
-app.use('/uploads', express.static(UPLOADS_DIR));
+app.use('/uploads', express.static(UPLOADS_DIR, {
+  maxAge: '7d',
+  etag: true
+}));
 
 // Главные страницы сервиса (строгий приоритет перед статикой)
 app.get(['/', '/landing'], (req, res) => {
@@ -342,10 +305,12 @@ app.get(['/editor', '/editor.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Статические файлы (js, css, картинки) БЕЗ автоматической раздачи index.html на корень
+// Статические файлы (js, css, картинки) с кэшированием и без автоматической раздачи index.html на корень
 app.use(express.static(__dirname, {
   index: false,
-  extensions: ['html', 'htm']
+  extensions: ['html', 'htm'],
+  maxAge: '1h',
+  etag: true
 }));
 
 // 404 обработчик

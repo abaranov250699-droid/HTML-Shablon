@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Конструктор HTML писем (Drag & Drop)</title>
+  <script src="/presets-data.js"></script>
+  <style>
+    :root {
+      --bg-main: #ffffff;
+      --bg-panel: #ffffff;
+      --bg-card: #f7f7f4;
+      --border-color: #e5e5df;
+      --border-dark: #0a0a0a;
+      --accent: #1e50ff;
+      --accent-hover: #1238b8;
+      --accent-green: #0e4f5a;
+      --text-main: #0a0a0a;
+      --text-muted: #666666;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0 !important; /* Строгий запрет скруглений */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: #ffffff;
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    header {
+      background-color: #ffffff;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-transform: uppercase;
+      letter-spacing: -0.3px;
+      color: var(--text-main);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary { 
+      background-color: var(--accent); 
+      color: #ffffff; 
+      border-color: var(--accent); 
+    }
+    .btn-primary:hover { 
+      background-color: var(--accent-hover); 
+      border-color: var(--accent-hover); 
+    }
+
+    .btn-success { 
+      background-color: #0a0a0a; 
+      color: #ffffff; 
+      border-color: #0a0a0a; 
+      font-weight: 800; 
+    }
+    .btn-success:hover { 
+      background-color: #262626; 
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover { 
+      background-color: #f5f5f0; 
+      border-color: var(--border-dark); 
+    }
+
+    .main-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    /* Левая панель настроек */
+    .sidebar {
+      width: 440px;
+      min-width: 380px;
+      background-color: #ffffff;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px;
+      gap: 18px;
+      user-select: text;
+    }
+
+    .section-card {
+      background-color: #f7f7f4;
+      border: 1px solid var(--border-color);
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      background-color: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.45;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+    .input-row .form-group {
+      flex: 1;
+    }
+
+    .color-picker-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: 1px solid var(--border-color);
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch {
+      border: none;
+    }
+
+    .align-selector {
+      display: flex;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .align-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 7px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    .align-btn:hover { 
+      color: var(--text-main); 
+      background: #f0f0eb;
+    }
+    .align-btn.active {
+      background-color: #0a0a0a;
+      color: #ffffff;
+    }
+
+    .hint-box {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: #ffffff;
+      border-left: 3px solid var(--accent);
+      padding: 8px 10px;
+      margin-top: 6px;
+      line-height: 1.35;
+      border: 1px solid var(--border-color);
+      border-left-width: 3px;
+    }
+
+    .upload-btn-wrap {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-file {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-file:hover { 
+      background: #f0f0eb; 
+      border-color: var(--border-dark);
+    }
+
+    .status-text {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* Правая панель - визуальный интерактивный холст */
+    .preview-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #f7f7f4;
+      overflow: hidden;
+    }
+
+    .preview-toolbar {
+      padding: 10px 24px;
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      flex-shrink: 0;
+    }
+
+    .canvas-viewport {
+      flex: 1;
+      overflow: auto;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background-color: #f7f7f4;
+      background-image: radial-gradient(#d5d5cf 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* Холст письма 600x1200 */
+    .email-canvas {
+      position: relative;
+      background-color: #ffffff;
+      box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--border-color);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    /* Интерактивные перетаскиваемые блоки */
+    .draggable-element {
+      position: absolute;
+      cursor: grab;
+      user-select: none;
+      box-sizing: border-box;
+      border: 1.5px dashed transparent;
+      transition: border-color 0.15s;
+    }
+
+    .draggable-element:hover {
+      border-color: var(--accent);
+    }
+
+    .draggable-element.selected {
+      border-color: var(--accent);
+      cursor: grabbing;
+    }
+
+    .element-drag-handle {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      display: none;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .draggable-element.selected .element-drag-handle {
+      display: block;
+    }
+
+    /* Модальное окно кода */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 10, 10, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-content {
+      background: #ffffff;
+      width: 90%;
+      max-width: 850px;
+      max-height: 85vh;
+      border: 2px solid #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 16px 16px 0px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f7f7f4;
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #0a0a0a;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #0a0a0a;
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-body {
+      padding: 24px;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+    }
+
+    .code-preview-area {
+      flex: 1;
+      background: #f7f7f4;
+      border: 1px solid var(--border-color);
+      color: #0a0a0a;
+      font-family: "Courier New", Courier, monospace;
+      padding: 16px;
+      font-size: 0.85rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      resize: none;
+      user-select: text;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background: #f7f7f4;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: var(--accent-green);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 2000;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Стили для системы авторизации и шаблонов */
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f7f7f4;
+      padding: 6px 12px;
+      border: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0a0a0a;
+    }
+
+    .user-avatar {
+      width: 24px;
+      height: 24px;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    .template-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      transition: border-color 0.15s;
+    }
+    .template-item:hover {
+      border-color: #0a0a0a;
+    }
+    .template-info h4 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: #0a0a0a;
+    }
+    .template-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .template-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Галерея готовых шаблонов */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .preset-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.05);
+    }
+
+    .preset-card:hover {
+      border-color: #0a0a0a;
+      transform: translateY(-2px);
+      box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .preset-preview-box {
+      height: 140px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      text-align: center;
+      background-size: cover;
+      background-position: center top;
+    }
+
+    .preset-body {
+      padding: 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+
+    .preset-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0a0a0a;
+      margin-bottom: 4px;
+    }
+
+    .preset-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    .preset-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      margin-bottom: 8px;
+      width: fit-content;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Верхняя шапка -->
+  <header>
+    <h1>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <polyline points="22,6 12,13 2,6"></polyline>
+      </svg>
+      Шаблонизатор HTML Писем (Drag & Drop)
+    </h1>
+    <div class="header-actions">
+      <!-- Возврат в каталог готовых шаблонов -->
+      <a href="/templates.html" class="btn btn-secondary" style="text-decoration: none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ← К готовым шаблонам
+      </a>
+
+      <!-- Кнопка галереи предзаготовленных шаблонов -->
+      <button class="btn btn-secondary" id="btnOpenPresets">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Шаблоны
+      </button>
+
+      <div style="width: 1px; height: 28px; background: var(--border-color); margin: 0 4px;"></div>
+
+      <!-- Блок авторизации / Профиль -->
+      <div id="authSection" style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-secondary" id="btnOpenAuth">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Войти
+        </button>
+      </div>
+
+      <div id="userSection" style="display: none; gap: 8px; align-items: center;">
+        <div class="user-badge">
+          <div class="user-avatar" id="userAvatarText">U</div>
+          <span id="userNameText" style="font-weight: 600;">user</span>
+        </div>
+        <button class="btn btn-secondary" id="btnMyTemplates">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          Мои шаблоны
+        </button>
+        <button class="btn btn-primary" id="btnSaveTemplate">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          Сохранить
+        </button>
+        <button class="btn btn-secondary" id="btnLogout" title="Выйти" style="padding: 8px 10px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+      </div>
+
+      <div style="width: 1px; height: 28px; background: var(--border-color); margin: 0 4px;"></div>
+
+      <button class="btn btn-secondary" id="btnViewCode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        Просмотр кода
+      </button>
+      <button class="btn btn-success" id="btnCopyCode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        Скопировать HTML код
+      </button>
+    </div>
+  </header>
+
+  <!-- Основная рабочая область -->
+  <div class="main-layout">
+    
+    <!-- Панель конфигурации -->
+    <div class="sidebar">
+
+      <!-- Фон и размеры полотна -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>Стиль и размеры полотна</span>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label>Цвет подложки</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="outerBgColor" value="#f1f5f9">
+              <input type="text" id="outerBgColorText" value="#f1f5f9">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Цвет карточки</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="cardBgColor" value="#ffffff">
+              <input type="text" id="cardBgColorText" value="#ffffff">
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: 10px;">
+          <label>URL фонового изображения</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="bgImageUrl" placeholder="https://... (прямая ссылка или Яндекс.Диск)" style="flex: 1;">
+            <button class="btn btn-secondary" id="btnClearBg" title="Удалить фон" style="padding: 6px 12px; font-size: 0.8rem;">✕</button>
+          </div>
+          <div class="upload-btn-wrap">
+            <label class="btn-file" for="bgFileInput">Загрузить фон с компьютера</label>
+            <input type="file" id="bgFileInput" accept="image/*" style="display: none;">
+          </div>
+          <div class="status-text" id="bgStatusText">Обработка фона...</div>
+        </div>
+        <div class="input-row" style="margin-top: 10px;">
+          <div class="form-group">
+            <label>Ширина письма (px)</label>
+            <input type="number" id="emailWidth" value="600" min="300" max="1000" step="10">
+          </div>
+          <div class="form-group">
+            <label>Высота письма (px)</label>
+            <input type="number" id="emailHeight" value="1200" min="400" max="3000" step="50">
+          </div>
+        </div>
+      </div>
+
+      <!-- Логотип -->
+      <div class="section-card" id="card-logo">
+        <div class="section-title">
+          <span>Логотип и графика</span>
+        </div>
+        <div class="form-group">
+          <label>Ссылка на логотип (URL или Яндекс.Диск)</label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="logoUrl" placeholder="https://..." value="https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY" style="flex: 1;">
+            <button class="btn btn-secondary" id="btnClearLogo" title="Удалить логотип" style="padding: 6px 12px; font-size: 0.8rem;">✕</button>
+          </div>
+          <div class="upload-btn-wrap">
+            <label class="btn-file" for="logoFileInput">Загрузить логотип с компьютера</label>
+            <input type="file" id="logoFileInput" accept="image/*" style="display: none;">
+          </div>
+          <div class="status-text" id="logoStatusText">Обработка логотипа...</div>
+        </div>
+        <div class="form-group">
+          <label>Ширина логотипа (px)</label>
+          <input type="number" id="logoWidth" value="160" min="30" max="600">
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label>X (слева, px)</label>
+            <input type="number" id="logoX" value="30" min="0" max="600">
+          </div>
+          <div class="form-group">
+            <label>Y (сверху, px)</label>
+            <input type="number" id="logoY" value="40" min="0" max="2500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Заголовок -->
+      <div class="section-card" id="card-header">
+        <div class="section-title">
+          <span>Заголовок письма</span>
+        </div>
+        <div class="form-group">
+          <label>Текст заголовка</label>
+          <input type="text" id="headerText" value="Специальное предложение для вас!">
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label>Размер шрифта (px)</label>
+            <input type="number" id="headerFontSize" value="26" min="14" max="48">
+          </div>
+          <div class="form-group">
+            <label>Цвет текста</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="headerColor" value="#0f172a">
+              <input type="text" id="headerColorText" value="#0f172a">
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>Ширина блока (px)</label>
+            <input type="number" id="headerW" value="540" min="100" max="600">
+          </div>
+          <div class="form-group">
+            <label>Выравнивание текста</label>
+            <div class="align-selector" data-target="headerAlign">
+              <button class="align-btn active" data-val="left">Лево</button>
+              <button class="align-btn" data-val="center">Центр</button>
+              <button class="align-btn" data-val="right">Право</button>
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>X (слева, px)</label>
+            <input type="number" id="headerX" value="30" min="0" max="600">
+          </div>
+          <div class="form-group">
+            <label>Y (сверху, px)</label>
+            <input type="number" id="headerY" value="130" min="0" max="2500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Основной текст -->
+      <div class="section-card" id="card-body">
+        <div class="section-title">
+          <span>Основной текст</span>
+        </div>
+        <div class="form-group">
+          <label>Содержимое</label>
+          <textarea id="bodyText" rows="5">Здравствуйте!
+
+Мы рады сообщить вам о запуске нашей новой программы лояльности. Теперь вы можете получать дополнительные скидки, бонусы и персональные рекомендации на каждый заказ.
+
+Ознакомьтесь с подробными условиями на нашем сайте или свяжитесь с персональным менеджером.</textarea>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label>Размер шрифта (px)</label>
+            <input type="number" id="bodyFontSize" value="15" min="11" max="24">
+          </div>
+          <div class="form-group">
+            <label>Цвет текста</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="bodyColor" value="#334155">
+              <input type="text" id="bodyColorText" value="#334155">
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>Ширина блока (px)</label>
+            <input type="number" id="bodyW" value="540" min="100" max="600">
+          </div>
+          <div class="form-group">
+            <label>Выравнивание</label>
+            <div class="align-selector" data-target="bodyAlign">
+              <button class="align-btn active" data-val="left">Лево</button>
+              <button class="align-btn" data-val="center">Центр</button>
+              <button class="align-btn" data-val="right">Право</button>
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>X (слева, px)</label>
+            <input type="number" id="bodyX" value="30" min="0" max="600">
+          </div>
+          <div class="form-group">
+            <label>Y (сверху, px)</label>
+            <input type="number" id="bodyY" value="230" min="0" max="2500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопка действия -->
+      <div class="section-card" id="card-button">
+        <div class="section-title">
+          <span>Кнопка действия (CTA)</span>
+        </div>
+        <div class="form-group">
+          <label>Текст кнопки</label>
+          <input type="text" id="buttonText" value="Перейти в личный кабинет">
+        </div>
+        <div class="form-group">
+          <label>Ссылка кнопки (URL)</label>
+          <input type="text" id="buttonUrl" value="https://example.com">
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label>Цвет кнопки</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="buttonBgColor" value="#3b82f6">
+              <input type="text" id="buttonBgColorText" value="#3b82f6">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Цвет текста</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="buttonTextColor" value="#ffffff">
+              <input type="text" id="buttonTextColorText" value="#ffffff">
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>X (слева, px)</label>
+            <input type="number" id="buttonX" value="30" min="0" max="600">
+          </div>
+          <div class="form-group">
+            <label>Y (сверху, px)</label>
+            <input type="number" id="buttonY" value="440" min="0" max="2500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Подпись -->
+      <div class="section-card" id="card-footer">
+        <div class="section-title">
+          <span>Подпись и подвал</span>
+        </div>
+        <div class="form-group">
+          <label>Текст подписи</label>
+          <textarea id="footerText" rows="3">С уважением,
+Команда клиентского сервиса
+support@example.com | +7 (800) 000-00-00</textarea>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label>Размер шрифта (px)</label>
+            <input type="number" id="footerFontSize" value="13" min="10" max="20">
+          </div>
+          <div class="form-group">
+            <label>Цвет текста</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="footerColor" value="#64748b">
+              <input type="text" id="footerColorText" value="#64748b">
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>Ширина блока (px)</label>
+            <input type="number" id="footerW" value="540" min="100" max="600">
+          </div>
+          <div class="form-group">
+            <label>Выравнивание</label>
+            <div class="align-selector" data-target="footerAlign">
+              <button class="align-btn active" data-val="left">Лево</button>
+              <button class="align-btn" data-val="center">Центр</button>
+              <button class="align-btn" data-val="right">Право</button>
+            </div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top: 8px;">
+          <div class="form-group">
+            <label>X (слева, px)</label>
+            <input type="number" id="footerX" value="30" min="0" max="600">
+          </div>
+          <div class="form-group">
+            <label>Y (сверху, px)</label>
+            <input type="number" id="footerY" value="530" min="0" max="2500">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Область визуального холста с Drag & Drop -->
+    <div class="preview-container">
+      <div class="preview-toolbar">
+        <div>ПОЗИЦИОНИРОВАНИЕ / 600×1200 PX: Перетаскивайте элементы мышью для установки точных координат X и Y</div>
+      </div>
+      <div class="canvas-viewport" id="canvasViewport">
+        <!-- Холст письма 600x1200 -->
+        <div class="email-canvas" id="emailCanvas" style="width: 600px; height: 1200px;">
+          
+          <!-- Элемент: Логотип -->
+          <div class="draggable-element" id="elem-logo" data-key="logo" style="left: 30px; top: 40px;">
+            <div class="element-drag-handle">🖼️ Логотип (перетащите)</div>
+            <img id="renderLogoImg" src="https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY" alt="Logo" style="display: block; width: 160px; max-width: 100%; height: auto; pointer-events: none;">
+          </div>
+
+          <!-- Элемент: Заголовок -->
+          <div class="draggable-element" id="elem-header" data-key="header" style="left: 30px; top: 130px; width: 540px;">
+            <div class="element-drag-handle">Заголовок (перетащите)</div>
+            <h1 id="renderHeaderText" style="margin: 0; font-size: 26px; line-height: 1.25; color: #0f172a; font-weight: 700; pointer-events: none;">
+              Специальное предложение для вас!
+            </h1>
+          </div>
+
+          <!-- Элемент: Текст -->
+          <div class="draggable-element" id="elem-body" data-key="body" style="left: 30px; top: 230px; width: 540px;">
+            <div class="element-drag-handle">Основной текст (перетащите)</div>
+            <div id="renderBodyText" style="font-size: 15px; line-height: 1.6; color: #334155; pointer-events: none;">
+              Здравствуйте!<br><br>Мы рады сообщить вам о запуске нашей новой программы лояльности.
+            </div>
+          </div>
+
+          <!-- Элемент: Кнопка CTA -->
+          <div class="draggable-element" id="elem-button" data-key="button" style="left: 30px; top: 440px;">
+            <div class="element-drag-handle">🔘 Кнопка (перетащите)</div>
+            <a id="renderButtonLink" href="#" style="font-size: 15px; font-weight: 600; color: #ffffff; background-color: #3b82f6; text-decoration: none; padding: 12px 28px; border-radius: 6px; display: inline-block; pointer-events: none;">
+              Перейти в личный кабинет
+            </a>
+          </div>
+
+          <!-- Элемент: Подпись -->
+          <div class="draggable-element" id="elem-footer" data-key="footer" style="left: 30px; top: 530px; width: 540px;">
+            <div class="element-drag-handle">✍️ Подпись (перетащите)</div>
+            <div id="renderFooterText" style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 13px; line-height: 1.5; color: #64748b; pointer-events: none;">
+              С уважением,<br>Команда клиентского сервиса
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Модальное окно просмотра кода -->
+  <div class="modal-overlay" id="codeModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>HTML Код готового письма (Табличная кросс-клиентская верстка)</h3>
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <textarea class="code-preview-area" id="codeTextarea" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCloseBtn2">Закрыть</button>
+        <button class="btn btn-success" id="modalCopyBtn">Скопировать код</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно авторизации (Вход / Регистрация) -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-content" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Вход в аккаунт</h3>
+        <button class="modal-close" id="authModalClose">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #0b1322; padding: 4px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <button class="tab-btn active" id="tabAuthLogin" style="flex: 1; padding: 8px;">Вход</button>
+          <button class="tab-btn" id="tabAuthRegister" style="flex: 1; padding: 8px;">Регистрация</button>
+        </div>
+
+        <form id="authForm" onsubmit="return false;">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>Логин</label>
+            <input type="text" id="authUsername" placeholder="Ваш логин" autocomplete="username" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label>Пароль</label>
+            <input type="password" id="authPassword" placeholder="Ваш пароль" autocomplete="current-password" required style="width: 100%; background-color: #0b1322; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; outline: none;">
+          </div>
+          <div id="authErrorMsg" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 14px; display: none;"></div>
+          <button type="submit" class="btn btn-primary" id="btnAuthSubmit" style="width: 100%; justify-content: center; padding: 10px;">Войти</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно "Мои шаблоны" -->
+  <div class="modal-overlay" id="templatesModal">
+    <div class="modal-content" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3>📂 Мои сохранённые шаблоны</h3>
+        <button class="modal-close" id="templatesModalClose">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px; max-height: 60vh; overflow-y: auto;">
+        <div id="templatesListContainer">
+          <!-- Список рендерится динамически -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="templatesModalCloseBtn">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно "Галерея готовых шаблонов" -->
+  <div class="modal-overlay" id="presetsModal">
+    <div class="modal-content" style="max-width: 900px;">
+      <div class="modal-header">
+        <h3>🎨 Готовые шаблоны писем</h3>
+        <button class="modal-close" id="presetsModalClose">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+          Выберите любой готовый дизайн. Вы сможете свободно редактировать его, менять фоны, текст и перетаскивать элементы:
+        </div>
+        <div class="presets-grid" id="presetsGrid">
+          <!-- Карточки готовых шаблонов генерируются динамически -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="presetsModalCloseBtn">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно "Сохранить шаблон" -->
+  <div class="modal-overlay" id="saveModal">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3>💾 Сохранить шаблон письма</h3>
+        <button class="modal-close" id="saveModalClose">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div class="form-group">
+          <label>Название шаблона</label>
+          <input type="text" id="templateNameInput" placeholder="Например: Промо-рассылка ноябрь" value="Новый шаблон письма">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="saveModalCancelBtn">Отмена</button>
+        <button class="btn btn-success" id="saveModalConfirmBtn">Сохранить в базу</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toastText">HTML код успешно скопирован в буфер обмена!</span>
+  </div>
+
+  <script>
+    // Состояние приложения с точными координатами X и Y для каждого элемента
+    const state = {
+      outerBgColor: '#f1f5f9',
+      cardBgColor: '#ffffff',
+      bgImageUrl: '',
+      emailWidth: 600,
+      emailHeight: 1200,
+
+      // Логотип
+      logoUrl: 'https://dummyimage.com/200x60/3b82f6/ffffff.png&text=LOGO+COMPANY',
+      logoWidth: 160,
+      logoX: 30,
+      logoY: 40,
+
+      // Заголовок
+      headerText: 'Специальное предложение для вас!',
+      headerFontSize: 26,
+      headerColor: '#0f172a',
+      headerAlign: 'left',
+      headerW: 540,
+      headerX: 30,
+      headerY: 130,
+
+      // Основной текст
+      bodyText: `Здравствуйте!\n\nМы рады сообщить вам о запуске нашей новой программы лояльности. Теперь вы можете получать дополнительные скидки, бонусы и персональные рекомендации на каждый заказ.\n\nОзнакомьтесь с подробными условиями на нашем сайте или свяжитесь с персональным менеджером.`,
+      bodyFontSize: 15,
+      bodyColor: '#334155',
+      bodyAlign: 'left',
+      bodyW: 540,
+      bodyX: 30,
+      bodyY: 230,
+
+      // Кнопка CTA
+      buttonText: 'Перейти в личный кабинет',
+      buttonUrl: 'https://example.com',
+      buttonBgColor: '#3b82f6',
+      buttonTextColor: '#ffffff',
+      buttonX: 30,
+      buttonY: 440,
+
+      // Подпись / Подвал
+      footerText: `С уважением,\nКоманда клиентского сервиса\nsupport@example.com | +7 (800) 000-00-00`,
+      footerFontSize: 13,
+      footerColor: '#64748b',
+      footerAlign: 'left',
+      footerW: 540,
+      footerX: 30,
+      footerY: 530
+    };
+
+    let currentTemplateId = null;
+    let currentUser = null;
+
+    // Обновление интерактивного холста
+    function updateCanvas() {
+      const canvas = document.getElementById('emailCanvas');
+      canvas.style.width = state.emailWidth + 'px';
+      canvas.style.height = state.emailHeight + 'px';
+      canvas.style.backgroundColor = state.cardBgColor;
+
+      const viewport = document.getElementById('canvasViewport');
+      viewport.style.backgroundColor = state.outerBgColor;
+
+      if (state.bgImageUrl) {
+        canvas.style.backgroundImage = `url('${state.bgImageUrl}')`;
+        canvas.style.backgroundRepeat = 'no-repeat';
+        canvas.style.backgroundSize = '100% auto';
+        canvas.style.backgroundPosition = 'center top';
+      } else {
+        canvas.style.backgroundImage = 'none';
+      }
+
+      // Логотип
+      const elemLogo = document.getElementById('elem-logo');
+      const renderLogoImg = document.getElementById('renderLogoImg');
+      if (state.logoUrl) {
+        elemLogo.style.display = 'block';
+        elemLogo.style.left = state.logoX + 'px';
+        elemLogo.style.top = state.logoY + 'px';
+        renderLogoImg.src = state.logoUrl;
+        renderLogoImg.style.width = state.logoWidth + 'px';
+      } else {
+        elemLogo.style.display = 'none';
+      }
+
+      // Заголовок
+      const elemHeader = document.getElementById('elem-header');
+      const renderHeaderText = document.getElementById('renderHeaderText');
+      if (state.headerText.trim()) {
+        elemHeader.style.display = 'block';
+        elemHeader.style.left = state.headerX + 'px';
+        elemHeader.style.top = state.headerY + 'px';
+        elemHeader.style.width = state.headerW + 'px';
+        renderHeaderText.textContent = state.headerText;
+        renderHeaderText.style.fontSize = state.headerFontSize + 'px';
+        renderHeaderText.style.color = state.headerColor;
+        renderHeaderText.style.textAlign = state.headerAlign;
+      } else {
+        elemHeader.style.display = 'none';
+      }
+
+      // Основной текст
+      const elemBody = document.getElementById('elem-body');
+      const renderBodyText = document.getElementById('renderBodyText');
+      if (state.bodyText.trim()) {
+        elemBody.style.display = 'block';
+        elemBody.style.left = state.bodyX + 'px';
+        elemBody.style.top = state.bodyY + 'px';
+        elemBody.style.width = state.bodyW + 'px';
+        renderBodyText.innerHTML = state.bodyText
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n\n/g, '<br><br>')
+          .replace(/\n/g, '<br>');
+        renderBodyText.style.fontSize = state.bodyFontSize + 'px';
+        renderBodyText.style.color = state.bodyColor;
+        renderBodyText.style.textAlign = state.bodyAlign;
+      } else {
+        elemBody.style.display = 'none';
+      }
+
+      // Кнопка CTA
+      const elemButton = document.getElementById('elem-button');
+      const renderButtonLink = document.getElementById('renderButtonLink');
+      if (state.buttonText.trim()) {
+        elemButton.style.display = 'block';
+        elemButton.style.left = state.buttonX + 'px';
+        elemButton.style.top = state.buttonY + 'px';
+        renderButtonLink.textContent = state.buttonText;
+        renderButtonLink.style.backgroundColor = state.buttonBgColor;
+        renderButtonLink.style.color = state.buttonTextColor;
+      } else {
+        elemButton.style.display = 'none';
+      }
+
+      // Подпись / Подвал
+      const elemFooter = document.getElementById('elem-footer');
+      const renderFooterText = document.getElementById('renderFooterText');
+      if (state.footerText.trim()) {
+        elemFooter.style.display = 'block';
+        elemFooter.style.left = state.footerX + 'px';
+        elemFooter.style.top = state.footerY + 'px';
+        elemFooter.style.width = state.footerW + 'px';
+        renderFooterText.innerHTML = state.footerText
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>');
+        renderFooterText.style.fontSize = state.footerFontSize + 'px';
+        renderFooterText.style.color = state.footerColor;
+        renderFooterText.style.textAlign = state.footerAlign;
+      } else {
+        elemFooter.style.display = 'none';
+      }
+    }
+
+    // Применение состояния шаблона (из готовых пресетов или сохраненных в БД) ко всем элементам
+    function applyLoadedTemplate(tpl) {
+      if (!tpl || !tpl.state) return;
+      currentTemplateId = tpl.id || null;
+
+      const tplInput = document.getElementById('templateNameInput');
+      if (tplInput && tpl.name) {
+        tplInput.value = tpl.name;
+      }
+
+      // Обновляем глобальное состояние письма
+      Object.assign(state, tpl.state);
+
+      // Синхронизация полей ввода панели управления
+      const inputIds = [
+        'outerBgColor', 'cardBgColor', 'bgImageUrl',
+        'emailWidth', 'emailHeight',
+        'logoUrl', 'logoWidth', 'logoX', 'logoY',
+        'headerText', 'headerFontSize', 'headerColor', 'headerW', 'headerX', 'headerY',
+        'bodyText', 'bodyFontSize', 'bodyColor', 'bodyW', 'bodyX', 'bodyY',
+        'buttonText', 'buttonUrl', 'buttonBgColor', 'buttonTextColor', 'buttonX', 'buttonY',
+        'footerText', 'footerFontSize', 'footerColor', 'footerW', 'footerX', 'footerY'
+      ];
+
+      inputIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && state[id] !== undefined) {
+          el.value = state[id];
+        }
+      });
+
+      // Синхронизация текстовых шестнадцатеричных полей цветов (#hex)
+      const colorSyncPairs = [
+        ['outerBgColor', 'outerBgColorText'],
+        ['cardBgColor', 'cardBgColorText'],
+        ['headerColor', 'headerColorText'],
+        ['bodyColor', 'bodyColorText'],
+        ['buttonBgColor', 'buttonBgColorText'],
+        ['buttonTextColor', 'buttonTextColorText'],
+        ['footerColor', 'footerColorText']
+      ];
+      colorSyncPairs.forEach(([pickerId, textId]) => {
+        const textEl = document.getElementById(textId);
+        if (textEl && state[pickerId]) {
+          textEl.value = state[pickerId];
+        }
+      });
+
+      // Синхронизация кнопок выравнивания текста (лево / центр / право)
+      ['header', 'body', 'footer'].forEach(prefix => {
+        const alignVal = state[prefix + 'Align'] || 'left';
+        const selector = document.querySelector(`.align-selector[data-target="${prefix}Align"]`);
+        if (selector) {
+          selector.querySelectorAll('.align-btn').forEach(btn => {
+            if (btn.getAttribute('data-val') === alignVal) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+        }
+      });
+
+      // Перерисовываем холст
+      updateCanvas();
+    }
+
+    // Загрузка готового пресета по его ID
+    function loadPresetById(presetId) {
+      if (typeof PRESET_TEMPLATES === 'undefined' || !Array.isArray(PRESET_TEMPLATES)) {
+        console.warn('PRESET_TEMPLATES не найден');
+        return false;
+      }
+      const found = PRESET_TEMPLATES.find(p => p.id === presetId);
+      if (!found) {
+        console.warn('Пресет не найден в каталоге:', presetId);
+        return false;
+      }
+      applyLoadedTemplate({ id: null, name: found.name, state: found.state });
+      showToast(`Шаблон "${found.name}" успешно загружен!`);
+      return true;
+    }
+
+    // Экспорт в глобальную область видимости
+    window.state = state;
+    window.applyLoadedTemplate = applyLoadedTemplate;
+    window.loadPresetById = loadPresetById;
+
+    // Реализация Drag & Drop для свободного перемещения элементов мышкой
+    function setupDragAndDrop() {
+      const canvas = document.getElementById('emailCanvas');
+      let currentDragElem = null;
+      let startMouseX = 0, startMouseY = 0;
+      let startElemX = 0, startElemY = 0;
+      let currentKey = '';
+
+      document.querySelectorAll('.draggable-element').forEach(elem => {
+        elem.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          document.querySelectorAll('.draggable-element').forEach(el => el.classList.remove('selected'));
+          elem.classList.add('selected');
+
+          currentDragElem = elem;
+          currentKey = elem.getAttribute('data-key');
+
+          startMouseX = e.clientX;
+          startMouseY = e.clientY;
+
+          startElemX = state[currentKey + 'X'];
+          startElemY = state[currentKey + 'Y'];
+
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+      });
+
+      function onMouseMove(e) {
+        if (!currentDragElem) return;
+        const dx = e.clientX - startMouseX;
+        const dy = e.clientY - startMouseY;
+
+        let newX = Math.round(startElemX + dx);
+        let newY = Math.round(startElemY + dy);
+
+        // Ограничение границами холста
+        newX = Math.max(0, Math.min(newX, state.emailWidth - 40));
+        newY = Math.max(0, Math.min(newY, state.emailHeight - 40));
+
+        state[currentKey + 'X'] = newX;
+        state[currentKey + 'Y'] = newY;
+
+        // Синхронизация с полями ввода в панели
+        const inputX = document.getElementById(currentKey + 'X');
+        const inputY = document.getElementById(currentKey + 'Y');
+        if (inputX) inputX.value = newX;
+        if (inputY) inputY.value = newY;
+
+        currentDragElem.style.left = newX + 'px';
+        currentDragElem.style.top = newY + 'px';
+      }
+
+      function onMouseUp() {
+        if (currentDragElem) {
+          currentDragElem.classList.remove('selected');
+          currentDragElem = null;
+        }
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+    }
+
+    // Генерация валидного адаптивного HTML кода письма
+    // Использует последовательный расчет относительных отступов между элементами для 100% поддержки Outlook/Gmail
+    function generateEmailHtml() {
+      const bgImg = state.bgImageUrl;
+      const logoImg = state.logoUrl;
+
+      let cardBgAttr = `bgcolor="${state.cardBgColor}"`;
+      let cardBgStyle = `background-color: ${state.cardBgColor};`;
+
+      if (bgImg) {
+        cardBgAttr += ` background="${bgImg}"`;
+        cardBgStyle += ` background-image: url('${bgImg}'); background-repeat: no-repeat; background-size: 100% auto; background-position: center top;`;
+      }
+
+      // Собираем элементы и их вертикальные позиции Y
+      const items = [
+        {
+          key: 'logo',
+          y: state.logoY,
+          x: state.logoX,
+          active: !!logoImg,
+          html: () => `
+            <tr>
+              <td style="padding-left: ${state.logoX}px; padding-right: 20px;">
+                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse: collapse;">
+                  <tr>
+                    <td>
+                      <img src="${logoImg}" alt="Logo" width="${state.logoWidth}" style="display: block; width: ${state.logoWidth}px; max-width: 100%; height: auto; border: 0; outline: none; text-decoration: none;">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`
+        },
+        {
+          key: 'header',
+          y: state.headerY,
+          x: state.headerX,
+          active: !!state.headerText.trim(),
+          html: () => `
+            <tr>
+              <td style="padding-left: ${state.headerX}px; padding-right: ${Math.max(15, state.emailWidth - state.headerX - state.headerW)}px; text-align: ${state.headerAlign};">
+                <h1 style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: ${state.headerFontSize}px; line-height: 1.25; color: ${state.headerColor}; font-weight: 700; text-align: ${state.headerAlign};">
+                  ${state.headerText}
+                </h1>
+              </td>
+            </tr>`
+        },
+        {
+          key: 'body',
+          y: state.bodyY,
+          x: state.bodyX,
+          active: !!state.bodyText.trim(),
+          html: () => {
+            const formatted = state.bodyText
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/\n\n/g, '</p><p style="margin: 0 0 14px 0;">')
+              .replace(/\n/g, '<br>');
+            return `
+            <tr>
+              <td style="padding-left: ${state.bodyX}px; padding-right: ${Math.max(15, state.emailWidth - state.bodyX - state.bodyW)}px; text-align: ${state.bodyAlign}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: ${state.bodyFontSize}px; line-height: 1.6; color: ${state.bodyColor};">
+                <p style="margin: 0 0 14px 0;">${formatted}</p>
+              </td>
+            </tr>`;
+          }
+        },
+        {
+          key: 'button',
+          y: state.buttonY,
+          x: state.buttonX,
+          active: !!state.buttonText.trim(),
+          html: () => `
+            <tr>
+              <td style="padding-left: ${state.buttonX}px; padding-right: 20px;">
+                <table border="0" cellspacing="0" cellpadding="0" role="presentation" style="border-collapse: collapse; display: inline-table;">
+                  <tr>
+                    <td align="center" bgcolor="${state.buttonBgColor}" style="border-radius: 6px; background-color: ${state.buttonBgColor};">
+                      <a href="${state.buttonUrl || '#'}" target="_blank" style="font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-weight: 600; color: ${state.buttonTextColor}; text-decoration: none; padding: 12px 28px; border-radius: 6px; display: inline-block;">
+                        <!--[if mso]><i style="letter-spacing: 28px; mso-font-width: -100%; mso-text-raise: 20pt;">&nbsp;</i><![endif]-->
+                        <span style="mso-text-raise: 10pt;">${state.buttonText}</span>
+                        <!--[if mso]><i style="letter-spacing: 28px; mso-font-width: -100%;">&nbsp;</i><![endif]-->
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`
+        },
+        {
+          key: 'footer',
+          y: state.footerY,
+          x: state.footerX,
+          active: !!state.footerText.trim(),
+          html: () => {
+            const formatted = state.footerText
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/\n/g, '<br>');
+            return `
+            <tr>
+              <td style="padding-left: ${state.footerX}px; padding-right: ${Math.max(15, state.emailWidth - state.footerX - state.footerW)}px; text-align: ${state.footerAlign}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: ${state.footerFontSize}px; line-height: 1.5; color: ${state.footerColor};">
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 14px;">
+                  ${formatted}
+                </div>
+              </td>
+            </tr>`;
+          }
+        }
+      ];
+
+      // Сортируем элементы по их реальной вертикальной координате Y сверху вниз
+      const activeItems = items.filter(it => it.active).sort((a, b) => a.y - b.y);
+
+      // Формируем строки с точными вычисленными отступами-разделителями
+      let rowsHtml = '';
+      let currentY = 0;
+
+      activeItems.forEach(item => {
+        const spacerHeight = Math.max(0, item.y - currentY);
+        if (spacerHeight > 0) {
+          rowsHtml += `
+            <!-- Отступ ${spacerHeight}px -->
+            <tr>
+              <td height="${spacerHeight}" style="height: ${spacerHeight}px; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">&nbsp;</td>
+            </tr>`;
+        }
+        rowsHtml += item.html();
+        // Примерная базово занятая высота элементом
+        let approxH = 40;
+        if (item.key === 'header') approxH = 40;
+        else if (item.key === 'body') approxH = 120;
+        else if (item.key === 'button') approxH = 45;
+        else if (item.key === 'footer') approxH = 50;
+        else if (item.key === 'logo') approxH = 50;
+
+        currentY = item.y + approxH;
+      });
+
+      // Хвостовой отступ до полной высоты 1200px
+      const remainingHeight = Math.max(0, state.emailHeight - currentY);
+      if (remainingHeight > 0) {
+        rowsHtml += `
+          <!-- Заполнение до высоты ${state.emailHeight}px -->
+          <tr>
+            <td height="${remainingHeight}" style="height: ${remainingHeight}px; font-size: 1px; line-height: 1px; mso-line-height-rule: exactly;">&nbsp;</td>
+          </tr>`;
+      }
+
+      return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>${state.headerText || 'HTML Email'}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100% !important; min-width: 100%; }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: ${state.outerBgColor}; min-width: 100%;">
+  <center style="width: 100%; background-color: ${state.outerBgColor};">
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="${state.outerBgColor}" style="border-collapse: collapse; background-color: ${state.outerBgColor};">
+      <tr>
+        <td align="center" style="padding: 0;">
+          <!--[if (gte mso 9)|(IE)]>
+          <table align="center" border="0" cellspacing="0" cellpadding="0" width="${state.emailWidth}" height="${state.emailHeight}">
+          <tr>
+          <td align="center" valign="top" width="${state.emailWidth}" height="${state.emailHeight}">
+          <![endif]-->
+          <table role="presentation" class="email-container" border="0" cellpadding="0" cellspacing="0" width="100%" height="${state.emailHeight}" style="max-width: ${state.emailWidth}px; width: 100%; min-height: ${state.emailHeight}px; height: ${state.emailHeight}px; border-collapse: collapse; ${cardBgStyle}" ${cardBgAttr}>
+            ${rowsHtml}
+          </table>
+          <!--[if (gte mso 9)|(IE)]>
+          </td>
+          </tr>
+          </table>
+          <![endif]-->
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+</html>`;
+    }
+
+    // Асинхронное получение прямой картинки (через сервер /api/fetch-remote)
+    async function processImageUrl(rawUrl, statusElement) {
+      if (!rawUrl) return '';
+      const cleanUrl = rawUrl.trim();
+
+      if (cleanUrl.startsWith('data:image')) {
+        return cleanUrl;
+      }
+
+      if (statusElement) {
+        statusElement.style.display = 'block';
+        statusElement.textContent = '⏳ Скачиваем и обрабатываем изображение...';
+      }
+
+      try {
+        const res = await fetch('/api/fetch-remote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: cleanUrl })
+        });
+        const data = await res.json();
+        
+        if (data.success && (data.base64 || data.url)) {
+          if (statusElement) {
+            statusElement.textContent = '✅ Изображение успешно загружено!';
+            setTimeout(() => { statusElement.style.display = 'none'; }, 3000);
+          }
+          return data.base64 || data.url;
+        } else {
+          if (statusElement) {
+            statusElement.textContent = '❌ ' + (data.error || 'Не удалось загрузить изображение');
+          }
+          return cleanUrl;
+        }
+      } catch (e) {
+        if (statusElement) {
+          statusElement.textContent = '❌ Ошибка сети: ' + e.message;
+        }
+        return cleanUrl;
+      }
+    }
+
+    // Настройка слушателей событий
+    function setupEventListeners() {
+      // Синхронизация цветов
+      const colorPairs = [
+        ['outerBgColor', 'outerBgColorText'],
+        ['cardBgColor', 'cardBgColorText'],
+        ['headerColor', 'headerColorText'],
+        ['bodyColor', 'bodyColorText'],
+        ['buttonBgColor', 'buttonBgColorText'],
+        ['buttonTextColor', 'buttonTextColorText'],
+        ['footerColor', 'footerColorText']
+      ];
+
+      colorPairs.forEach(([pickerId, textId]) => {
+        const picker = document.getElementById(pickerId);
+        const text = document.getElementById(textId);
+
+        picker.addEventListener('input', (e) => {
+          text.value = e.target.value;
+          state[pickerId] = e.target.value;
+          updateCanvas();
+        });
+
+        text.addEventListener('input', (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            picker.value = e.target.value;
+          }
+          state[pickerId] = e.target.value;
+          updateCanvas();
+        });
+      });
+
+      // Фон
+      const bgInput = document.getElementById('bgImageUrl');
+      const bgStatus = document.getElementById('bgStatusText');
+      let bgDebounce;
+      bgInput.addEventListener('input', (e) => {
+        clearTimeout(bgDebounce);
+        bgDebounce = setTimeout(async () => {
+          state.bgImageUrl = await processImageUrl(e.target.value, bgStatus);
+          updateCanvas();
+        }, 500);
+      });
+
+      const btnClearBg = document.getElementById('btnClearBg');
+      if (btnClearBg) {
+        btnClearBg.addEventListener('click', () => {
+          bgInput.value = '';
+          state.bgImageUrl = '';
+          if (bgStatus) bgStatus.style.display = 'none';
+          updateCanvas();
+        });
+      }
+
+      const bgFileInput = document.getElementById('bgFileInput');
+      bgFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          state.bgImageUrl = event.target.result;
+          bgInput.value = '(файл: ' + file.name + ')';
+          updateCanvas();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Логотип
+      const logoInput = document.getElementById('logoUrl');
+      const logoStatus = document.getElementById('logoStatusText');
+      let logoDebounce;
+      logoInput.addEventListener('input', (e) => {
+        clearTimeout(logoDebounce);
+        logoDebounce = setTimeout(async () => {
+          state.logoUrl = await processImageUrl(e.target.value, logoStatus);
+          updateCanvas();
+        }, 500);
+      });
+
+      const btnClearLogo = document.getElementById('btnClearLogo');
+      if (btnClearLogo) {
+        btnClearLogo.addEventListener('click', () => {
+          logoInput.value = '';
+          state.logoUrl = '';
+          if (logoStatus) logoStatus.style.display = 'none';
+          updateCanvas();
+        });
+      }
+
+      const logoFileInput = document.getElementById('logoFileInput');
+      logoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          state.logoUrl = event.target.result;
+          logoInput.value = '(файл: ' + file.name + ')';
+          updateCanvas();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Числовые поля координат и параметров
+      const simpleInputs = [
+        'emailWidth', 'emailHeight',
+        'logoWidth', 'logoX', 'logoY',
+        'headerText', 'headerFontSize', 'headerW', 'headerX', 'headerY',
+        'bodyText', 'bodyFontSize', 'bodyW', 'bodyX', 'bodyY',
+        'buttonText', 'buttonUrl', 'buttonX', 'buttonY',
+        'footerText', 'footerFontSize', 'footerW', 'footerX', 'footerY'
+      ];
+
+      simpleInputs.forEach(id => {
+        const elem = document.getElementById(id);
+        if (!elem) return;
+        elem.addEventListener('input', (e) => {
+          const val = e.target.type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value;
+          state[id] = val;
+          updateCanvas();
+        });
+      });
+
+      // Переключатели выравнивания
+      document.querySelectorAll('.align-selector').forEach(selector => {
+        const targetProp = selector.getAttribute('data-target');
+        selector.querySelectorAll('.align-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selector.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state[targetProp] = btn.getAttribute('data-val');
+            updateCanvas();
+          });
+        });
+      });
+
+      // Модальное окно просмотра кода
+      const modal = document.getElementById('codeModal');
+      const codeTextarea = document.getElementById('codeTextarea');
+      const btnViewCode = document.getElementById('btnViewCode');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+      const modalCloseBtn2 = document.getElementById('modalCloseBtn2');
+      const modalCopyBtn = document.getElementById('modalCopyBtn');
+      const btnCopyCode = document.getElementById('btnCopyCode');
+
+      function openModal() {
+        codeTextarea.value = generateEmailHtml();
+        modal.classList.add('open');
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+      }
+
+      btnViewCode.addEventListener('click', openModal);
+      modalCloseBtn.addEventListener('click', closeModal);
+      modalCloseBtn2.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // Копирование кода в буфер
+      function copyCodeToClipboard() {
+        const html = generateEmailHtml();
+        navigator.clipboard.writeText(html).then(() => {
+          showToast('HTML код письма скопирован в буфер обмена!');
+        }).catch(err => {
+          const tempArea = document.createElement('textarea');
+          tempArea.value = html;
+          document.body.appendChild(tempArea);
+          tempArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(tempArea);
+          showToast('HTML код письма скопирован в буфер обмена!');
+        });
+      }
+
+      btnCopyCode.addEventListener('click', copyCodeToClipboard);
+      modalCopyBtn.addEventListener('click', copyCodeToClipboard);
+
+      // ================= УПРАВЛЕНИЕ АВТОРИЗАЦИЕЙ И ШАБЛОНАМИ =================
+      let authMode = 'login'; // 'login' или 'register'
+
+      const authModal = document.getElementById('authModal');
+      const btnOpenAuth = document.getElementById('btnOpenAuth');
+      const authModalClose = document.getElementById('authModalClose');
+      const tabAuthLogin = document.getElementById('tabAuthLogin');
+      const tabAuthRegister = document.getElementById('tabAuthRegister');
+      const authModalTitle = document.getElementById('authModalTitle');
+      const btnAuthSubmit = document.getElementById('btnAuthSubmit');
+      const authErrorMsg = document.getElementById('authErrorMsg');
+      const authForm = document.getElementById('authForm');
+      const authUsername = document.getElementById('authUsername');
+      const authPassword = document.getElementById('authPassword');
+
+      const authSection = document.getElementById('authSection');
+      const userSection = document.getElementById('userSection');
+      const userNameText = document.getElementById('userNameText');
+      const userAvatarText = document.getElementById('userAvatarText');
+      const btnLogout = document.getElementById('btnLogout');
+
+      const btnSaveTemplate = document.getElementById('btnSaveTemplate');
+      const saveModal = document.getElementById('saveModal');
+      const saveModalClose = document.getElementById('saveModalClose');
+      const saveModalCancelBtn = document.getElementById('saveModalCancelBtn');
+      const saveModalConfirmBtn = document.getElementById('saveModalConfirmBtn');
+      const templateNameInput = document.getElementById('templateNameInput');
+
+      const btnMyTemplates = document.getElementById('btnMyTemplates');
+      const templatesModal = document.getElementById('templatesModal');
+      const templatesModalClose = document.getElementById('templatesModalClose');
+      const templatesModalCloseBtn = document.getElementById('templatesModalCloseBtn');
+      const templatesListContainer = document.getElementById('templatesListContainer');
+
+      // Переключение вкладок вход/регистрация
+      tabAuthLogin.addEventListener('click', () => {
+        authMode = 'login';
+        tabAuthLogin.classList.add('active');
+        tabAuthRegister.classList.remove('active');
+        authModalTitle.textContent = 'Вход в аккаунт';
+        btnAuthSubmit.textContent = 'Войти';
+        authErrorMsg.style.display = 'none';
+      });
+
+      tabAuthRegister.addEventListener('click', () => {
+        authMode = 'register';
+        tabAuthRegister.classList.add('active');
+        tabAuthLogin.classList.remove('active');
+        authModalTitle.textContent = 'Регистрация аккаунта';
+        btnAuthSubmit.textContent = 'Зарегистрироваться';
+        authErrorMsg.style.display = 'none';
+      });
+
+      btnOpenAuth.addEventListener('click', () => {
+        authModal.classList.add('open');
+        authUsername.value = '';
+        authPassword.value = '';
+        authErrorMsg.style.display = 'none';
+      });
+
+      authModalClose.addEventListener('click', () => authModal.classList.remove('open'));
+      authModal.addEventListener('click', (e) => { if (e.target === authModal) authModal.classList.remove('open'); });
+
+      // Отправка формы авторизации
+      authForm.addEventListener('submit', async () => {
+        const username = authUsername.value.trim();
+        const password = authPassword.value;
+        authErrorMsg.style.display = 'none';
+
+        const endpoint = authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            authErrorMsg.textContent = data.error || 'Ошибка входа';
+            authErrorMsg.style.display = 'block';
+            return;
+          }
+
+          // Сохраняем токен
+          localStorage.setItem('email_builder_token', data.token);
+          currentUser = data.user;
+          updateUserUI();
+          authModal.classList.remove('open');
+          showToast(`Добро пожаловать, ${currentUser.username}!`);
+        } catch (err) {
+          authErrorMsg.textContent = 'Ошибка сети: ' + err.message;
+          authErrorMsg.style.display = 'block';
+        }
+      });
+
+      function updateUserUI() {
+        if (currentUser) {
+          authSection.style.display = 'none';
+          userSection.style.display = 'flex';
+          userNameText.textContent = currentUser.username;
+          userAvatarText.textContent = currentUser.username.charAt(0).toUpperCase();
+        } else {
+          authSection.style.display = 'flex';
+          userSection.style.display = 'none';
+        }
+      }
+
+      // Выход
+      btnLogout.addEventListener('click', async () => {
+        const token = localStorage.getItem('email_builder_token');
+        if (token) {
+          try {
+            await fetch('/api/auth/logout', {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + token }
+            });
+          } catch (e) {}
+        }
+        localStorage.removeItem('email_builder_token');
+        currentUser = null;
+        currentTemplateId = null;
+        updateUserUI();
+        showToast('Вы успешно вышли из аккаунта');
+      });
+
+      // Проверка сессии при старте
+      async function checkCurrentSession() {
+        const token = localStorage.getItem('email_builder_token');
+        if (!token) return;
+
+        try {
+          const res = await fetch('/api/auth/me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const data = await res.json();
+          if (data.authenticated && data.user) {
+            currentUser = data.user;
+            updateUserUI();
+          } else {
+            localStorage.removeItem('email_builder_token');
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      // Сохранение шаблона
+      btnSaveTemplate.addEventListener('click', () => {
+        if (!currentUser) {
+          btnOpenAuth.click();
+          return;
+        }
+        saveModal.classList.add('open');
+      });
+
+      saveModalClose.addEventListener('click', () => saveModal.classList.remove('open'));
+      saveModalCancelBtn.addEventListener('click', () => saveModal.classList.remove('open'));
+      saveModal.addEventListener('click', (e) => { if (e.target === saveModal) saveModal.classList.remove('open'); });
+
+      saveModalConfirmBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('email_builder_token');
+        const name = templateNameInput.value.trim() || 'Шаблон письма';
+
+        try {
+          const res = await fetch('/api/templates', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              id: currentTemplateId,
+              name,
+              state: { ...state }
+            })
+          });
+
+          const data = await res.json();
+          if (data.success && data.template) {
+            currentTemplateId = data.template.id;
+            saveModal.classList.remove('open');
+            showToast(`Шаблон "${name}" успешно сохранен в базе данных!`);
+          } else {
+            alert('Ошибка при сохранении: ' + (data.error || 'неизвестная ошибка'));
+          }
+        } catch (err) {
+          alert('Ошибка сети: ' + err.message);
+        }
+      });
+
+      // Открытие списка шаблонов
+      btnMyTemplates.addEventListener('click', async () => {
+        templatesModal.classList.add('open');
+        await loadTemplatesList();
+      });
+
+      templatesModalClose.addEventListener('click', () => templatesModal.classList.remove('open'));
+      templatesModalCloseBtn.addEventListener('click', () => templatesModal.classList.remove('open'));
+      templatesModal.addEventListener('click', (e) => { if (e.target === templatesModal) templatesModal.classList.remove('open'); });
+
+      async function loadTemplatesList() {
+        const token = localStorage.getItem('email_builder_token');
+        templatesListContainer.innerHTML = '<div style="color:var(--text-muted); padding:20px; text-align:center;">Загрузка шаблонов...</div>';
+
+        try {
+          const res = await fetch('/api/templates', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          const data = await res.json();
+
+          if (!data.success || !data.templates || data.templates.length === 0) {
+            templatesListContainer.innerHTML = '<div style="color:var(--text-muted); padding:30px; text-align:center;">У вас пока нет сохранённых шаблонов. Создайте и сохраните свой первый шаблон!</div>';
+            return;
+          }
+
+          templatesListContainer.innerHTML = '';
+          data.templates.forEach(tpl => {
+            const dateStr = new Date(tpl.updatedAt).toLocaleString('ru-RU');
+            const item = document.createElement('div');
+            item.className = 'template-item';
+
+            item.innerHTML = `
+              <div class="template-info">
+                <h4>${escapeHtml(tpl.name)}</h4>
+                <span>Обновлен: ${dateStr} | ${tpl.state.emailWidth || 600}x${tpl.state.emailHeight || 1200}px</span>
+              </div>
+              <div class="template-actions">
+                <button class="btn btn-primary btn-load-tpl" style="padding: 6px 12px; font-size: 0.8rem;">Загрузить</button>
+                <button class="btn btn-secondary btn-del-tpl" style="padding: 6px 10px; font-size: 0.8rem; color: #ef4444;" title="Удалить">✕</button>
+              </div>
+            `;
+
+            // Загрузка выбранного шаблона
+            item.querySelector('.btn-load-tpl').addEventListener('click', () => {
+              applyLoadedTemplate(tpl);
+              templatesModal.classList.remove('open');
+              showToast(`Шаблон "${tpl.name}" загружен на холст!`);
+            });
+
+            // Удаление шаблона
+            item.querySelector('.btn-del-tpl').addEventListener('click', async (e) => {
+              e.stopPropagation();
+              if (!confirm(`Удалить шаблон "${tpl.name}"?`)) return;
+              try {
+                const delRes = await fetch('/api/templates/' + tpl.id, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const delData = await delRes.json();
+                if (delData.success) {
+                  if (currentTemplateId === tpl.id) currentTemplateId = null;
+                  loadTemplatesList();
+                  showToast('Шаблон удален');
+                }
+              } catch (err) {
+                alert('Ошибка при удалении: ' + err.message);
+              }
+            });
+
+            templatesListContainer.appendChild(item);
+          });
+        } catch (e) {
+          templatesListContainer.innerHTML = `<div style="color:#ef4444; padding:20px;">Ошибка загрузки: ${e.message}</div>`;
+        }
+      }
+
+      function escapeHtml(text) {
+        return (text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      // ================= КАТАЛОГ ГОТОВЫХ ШАБЛОНОВ (PRESETS) =================
+      const presets = typeof PRESET_TEMPLATES !== 'undefined' ? PRESET_TEMPLATES : [];
+
+      const btnOpenPresets = document.getElementById('btnOpenPresets');
+      const presetsModal = document.getElementById('presetsModal');
+      const presetsModalClose = document.getElementById('presetsModalClose');
+      const presetsModalCloseBtn = document.getElementById('presetsModalCloseBtn');
+      const presetsGrid = document.getElementById('presetsGrid');
+
+      function renderPresetsGallery() {
+        presetsGrid.innerHTML = '';
+        presets.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'preset-card';
+
+          card.innerHTML = `
+            <div class="preset-preview-box" style="background: ${p.bgPreview};">
+              <span class="preset-tag" style="background: ${p.tagColor}; color: #fff;">${p.tag}</span>
+              <div style="font-weight: 700; font-size: 1.05rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">
+                ${p.name}
+              </div>
+            </div>
+            <div class="preset-body">
+              <div>
+                <div class="preset-title">${p.name}</div>
+                <div class="preset-desc">${p.desc}</div>
+              </div>
+              <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 8px;">
+                Выбрать этот шаблон
+              </button>
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            currentTemplateId = null;
+            applyLoadedTemplate({ name: p.name, state: p.state });
+            presetsModal.classList.remove('open');
+            showToast(`Шаблон "${p.name}" успешно применен на холст!`);
+          });
+
+          presetsGrid.appendChild(card);
+        });
+      }
+
+      btnOpenPresets.addEventListener('click', () => {
+        renderPresetsGallery();
+        presetsModal.classList.add('open');
+      });
+
+      presetsModalClose.addEventListener('click', () => presetsModal.classList.remove('open'));
+      presetsModalCloseBtn.addEventListener('click', () => presetsModal.classList.remove('open'));
+      presetsModal.addEventListener('click', (e) => { if (e.target === presetsModal) presetsModal.classList.remove('open'); });
+
+      // Запуск проверки сессии
+      checkCurrentSession();
+    }
+
+    // Всплывающее уведомление
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toastText');
+      if (message) toastText.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Старт приложения
+    window.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      setupDragAndDrop();
+
+      // Проверка параметров URL или сохраненного выбора пресета
+      const urlParams = new URLSearchParams(window.location.search);
+      let presetParam = urlParams.get('preset');
+      const isNew = urlParams.get('new');
+
+      if (!presetParam) {
+        try {
+          presetParam = localStorage.getItem('selected_preset_id');
+        } catch (e) {}
+      }
+
+      if (presetParam) {
+        try {
+          localStorage.removeItem('selected_preset_id');
+        } catch (e) {}
+        const applied = loadPresetById(presetParam);
+        if (!applied) {
+          updateCanvas();
+        }
+      } else if (isNew) {
+        updateCanvas();
+        showToast('Создание нового письма с чистого листа');
+      } else {
+        updateCanvas();
+      }
+    });
+  </script>
+</body>
+</html>

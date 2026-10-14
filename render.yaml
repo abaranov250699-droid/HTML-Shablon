@@ -1,0 +1,27 @@
+# ============================================================================
+# RENDER.COM INFRASTRUCTURE AS CODE (BLUEPRINT)
+# Web Service: Node.js / Express.js
+# Database: Neon.tech Serverless PostgreSQL (eu-central-1)
+# ============================================================================
+
+services:
+  - type: web
+    name: power-sales-bi
+    env: node
+    plan: free
+    region: frankfurt # eu-central-1 (минимальная задержка до Neon PostgreSQL)
+    branch: main
+    autoDeploy: true  # Автоматический деплой при каждом git push в ветку main
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true # Render сгенерирует криптографически стойкий секрет
+      - key: DATABASE_URL
+        sync: false # Задается в Render Dashboard из параметров вашей БД Neon.tech

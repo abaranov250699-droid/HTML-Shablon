@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailCraft — Платформа создания и верстки HTML-писем</title>
+  <style>
+    /*
+      СТИЛЬ: Строгий архитектурный швейцарский / венчурный нео-брутализм (по референсу)
+      - Никаких скруглений (border-radius: 0px)
+      - Никаких обводок/размытых свечений, только четкие тонкие линии-разделители (1px solid)
+      - Палитра: белый (#fff), теплый слоновая кость/крем (#f7f7f4), электрический синий (#1e50ff),
+        глубокий бирюзовый (#0e4f5a), терракота (#b86d29), светло-голубой (#bfe2ff), строгий черный (#0a0a0a).
+      - Только векторные SVG иконки, никаких стикеров и эмодзи.
+    */
+    :root {
+      --bg-light: #ffffff;
+      --bg-cream: #f7f7f4;
+      --bg-blue: #1e50ff;
+      --bg-blue-dark: #1238b8;
+      --bg-teal: #0e4f5a;
+      --bg-ochre: #b86d29;
+      --bg-ice: #d8ecff;
+      --text-black: #0a0a0a;
+      --text-gray: #666666;
+      --text-light-gray: #a3a3a3;
+      --line-dark: #0a0a0a;
+      --line-gray: #e5e5df;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0 !important; /* Полный запрет скруглений по всему сайту */
+      font-family: var(--font-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-black);
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    /* Верхняя строгая линия сайта */
+    .top-hairline {
+      height: 3px;
+      background: var(--bg-blue);
+      width: 100%;
+    }
+
+    /* Навигация */
+    nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line-gray);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-black);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--bg-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .nav-link {
+      color: var(--text-black);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover {
+      color: var(--bg-blue);
+    }
+
+    /* Кнопки — четкие прямоугольники без скруглений */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 14px 28px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .btn-blue {
+      background: var(--bg-blue);
+      color: #ffffff;
+      border-color: var(--bg-blue);
+    }
+
+    .btn-blue:hover {
+      background: var(--bg-blue-dark);
+      border-color: var(--bg-blue-dark);
+    }
+
+    .btn-white {
+      background: #ffffff;
+      color: var(--text-black);
+      border-color: #ffffff;
+    }
+
+    .btn-white:hover {
+      background: #f0f0f0;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-black);
+      border-color: var(--text-black);
+    }
+
+    .btn-outline:hover {
+      background: var(--text-black);
+      color: #ffffff;
+    }
+
+    .btn-nav {
+      padding: 10px 20px;
+      font-size: 0.8rem;
+    }
+
+    /* СЕКЦИЯ 1: HERO по референсу (3D-изометрия слева, заголовок и текст справа) */
+    .hero-split {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 32px 50px 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      border-bottom: 1px solid var(--line-gray);
+    }
+
+    .hero-graphic {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    /* Архитектурный изометрический знак в стиле R-монограммы из референса */
+    .iso-monogram-container {
+      width: 100%;
+      max-width: 440px;
+      height: 280px;
+      background: #ffffff;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-tagline {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      text-transform: none;
+      color: var(--text-black);
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 20px;
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      color: var(--text-black);
+      margin-bottom: 28px;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--text-gray);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 35px;
+    }
+
+    /* СЕКЦИЯ 2: СИНИЙ БАННЕР В СТИЛЕ РЕФЕРЕНСА */
+    .blue-banner-section {
+      background: var(--bg-blue);
+      color: #ffffff;
+      border-bottom: 1px solid var(--line-dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blue-banner-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 80px 32px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .blue-banner-subtitle {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .blue-banner-title {
+      font-size: clamp(2rem, 3.5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      max-width: 900px;
+      letter-spacing: -0.5px;
+    }
+
+    .blue-banner-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .blue-banner-action {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .blue-banner-meta {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 420px;
+    }
+
+    /* СЕКЦИЯ 3: ГИГАНТСКИЙ ТИПОГРАФИЧЕСКИЙ СТРОГИЙ МАНИФЕСТ (двухтоновый текст из референса) */
+    .editorial-manifesto {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 90px 32px;
+      border-bottom: 1px solid var(--line-gray);
+    }
+
+    .manifesto-heading {
+      font-size: clamp(2.2rem, 4.8vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    .manifesto-line-dark {
+      color: var(--text-black);
+      display: block;
+    }
+
+    .manifesto-line-light {
+      color: var(--text-light-gray);
+      display: block;
+    }
+
+    /* СЕКЦИЯ 4: ТРИ МОНОЛИТА НА КРЕМОВОМ ФОНЕ (Teal, Blue, Ochre) */
+    .monolith-section {
+      background: var(--bg-cream);
+      border-bottom: 1px solid var(--line-gray);
+      padding: 90px 32px;
+    }
+
+    .monolith-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .monolith-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-bottom: 50px;
+    }
+
+    .monolith-card {
+      height: 380px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.08); /* Четкая тень без размытия */
+      color: #ffffff;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .monolith-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 16px 16px 0px rgba(0, 0, 0, 0.12);
+    }
+
+    .monolith-teal {
+      background: var(--bg-teal);
+    }
+
+    .monolith-blue {
+      background: var(--bg-blue);
+    }
+
+    .monolith-ochre {
+      background: var(--bg-ochre);
+    }
+
+    .monolith-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 16px;
+    }
+
+    .monolith-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .monolith-num {
+      font-size: 0.85rem;
+      font-weight: 800;
+      opacity: 0.5;
+    }
+
+    .monolith-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+
+    .monolith-foot {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 16px;
+    }
+
+    .monolith-summary {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .monolith-summary p {
+      font-size: 1.05rem;
+      color: var(--text-gray);
+      line-height: 1.5;
+    }
+
+    /* СЕКЦИЯ 5: СТАТИСТИКА 100% В СВЕТЛО-ГОЛУБОМ БЛОКЕ */
+    .metrics-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 90px 32px;
+      border-bottom: 1px solid var(--line-gray);
+    }
+
+    .metrics-header {
+      font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      max-width: 820px;
+      margin-bottom: 40px;
+      line-height: 1.15;
+    }
+
+    .metrics-display-box {
+      width: 100%;
+      background: var(--bg-ice);
+      padding: 60px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 40px;
+      border: 1px solid #b2d7fc;
+    }
+
+    .metrics-huge-num {
+      font-size: clamp(4.5rem, 12vw, 9rem);
+      font-weight: 900;
+      color: var(--bg-blue);
+      letter-spacing: -4px;
+      line-height: 1;
+    }
+
+    .metrics-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 24px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--bg-blue);
+    }
+
+    .metrics-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      border-top: 1px solid var(--line-dark);
+      padding-top: 30px;
+    }
+
+    .metrics-col h4 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metrics-col p {
+      color: var(--text-gray);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* СЕКЦИЯ 6: ДВУХКОЛОНОЧНЫЙ МЕТОДОЛОГИЧЕСКИЙ БЛОК */
+    .method-section {
+      background: var(--bg-cream);
+      padding: 90px 32px;
+      border-bottom: 1px solid var(--line-gray);
+    }
+
+    .method-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 70px;
+      align-items: center;
+    }
+
+    .method-left h3 {
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 24px;
+    }
+
+    .method-left p {
+      font-size: 1rem;
+      color: var(--text-gray);
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+
+    .method-right-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .method-block {
+      padding: 30px 36px;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 8px 8px 0px rgba(0,0,0,0.06);
+    }
+
+    .method-block-teal {
+      background: var(--bg-teal);
+    }
+
+    .method-block-ochre {
+      background: var(--bg-ochre);
+    }
+
+    .method-block h4 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .method-block span {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.75;
+    }
+
+    /* СЕКЦИЯ CTA ВНИЗУ */
+    .bottom-cta {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 100px 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bottom-cta h2 {
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+
+    .bottom-cta p {
+      font-size: 1.1rem;
+      color: var(--text-gray);
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+
+    /* Футер в стиле швейцарского издания */
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--line-dark);
+      padding: 40px 32px;
+    }
+
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 992px) {
+      .hero-split { grid-template-columns: 1fr; gap: 40px; }
+      .monolith-grid { grid-template-columns: 1fr; }
+      .monolith-summary { grid-template-columns: 1fr; }
+      .metrics-columns { grid-template-columns: 1fr; gap: 30px; }
+      .method-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-hairline"></div>
+
+  <!-- Навигация без скруглений -->
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="brand">
+        <div class="brand-mark">
+          <!-- Четкая геометрическая SVG-монограмма -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 4H20V10H10V14H18V20H4V4Z" fill="#ffffff" />
+          </svg>
+        </div>
+        <span>MailCraft / 600</span>
+      </a>
+
+      <div class="nav-menu">
+        <a href="/templates.html" class="nav-link">Каталог шаблонов</a>
+        <a href="/editor.html" class="nav-link">Редактор</a>
+        <a href="/templates.html" class="btn btn-blue btn-nav">
+          <span>Создать письмо</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- СЕКЦИЯ 1: HERO (Строгий изометрический знак + крупный гротескный заголовок) -->
+  <section class="hero-split">
+    <div class="hero-graphic">
+      <div class="iso-monogram-container">
+        <!-- Векторная 3D изометрическая монограмма в точной палитре референса -->
+        <svg width="340" height="240" viewBox="0 0 340 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Грань левая верхняя -->
+          <polygon points="40,90 120,40 120,200 40,150" fill="#2563eb" />
+          <!-- Грань верхняя скошенная -->
+          <polygon points="120,40 220,40 280,100 200,100" fill="#3b82f6" />
+          <!-- Центральный монолит -->
+          <polygon points="120,100 200,100 200,150 120,150" fill="#1d4ed8" />
+          <!-- Правая изометрическая диагональ -->
+          <polygon points="200,100 280,100 220,200 150,200" fill="#1e40af" />
+          <!-- Нижняя теневая грань -->
+          <polygon points="150,200 220,200 200,220 130,220" fill="#172554" />
+          <polygon points="40,150 120,200 120,220 40,170" fill="#1e3a8a" />
+        </svg>
+      </div>
+      <div class="hero-tagline">
+        Стандарт + Экспертиза.
+      </div>
+    </div>
+
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Инфраструктура<br>
+        верстки писем.
+      </h1>
+      <p class="hero-desc">
+        Профессиональный инструмент создания адаптивных почтовых рассылок с жестким соблюдением формата 600×1200 px, 
+        свободным перетаскиванием блоков и табличным рендерингом для всех почтовых клиентов.
+      </p>
+      <div>
+        <a href="/templates.html" class="btn btn-blue" id="btnCreateEmail">
+          <span>Создать HTML письмо</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 2: СИНИЙ БАННЕР ИЗ РЕФЕРЕНСА -->
+  <section class="blue-banner-section">
+    <div class="blue-banner-container">
+      <div class="blue-banner-subtitle">
+        ПОЧТОВАЯ АРХИТЕКТУРА / 600PX
+      </div>
+      <h2 class="blue-banner-title">
+        Мы проектируем шаблоны рассылок, которые стабильно открываются в Outlook, Gmail и мобильных клиентах.
+      </h2>
+      <div class="blue-banner-foot">
+        <div class="blue-banner-action">
+          <a href="/templates.html" class="btn btn-white">
+            <span>Выбрать шаблон из каталога</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+        <div class="blue-banner-meta">
+          Табличный каркас с поддержкой условных VML-комментариев Microsoft Office. Никаких искажений сетки и расползания колонок.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 3: ГИГАНТСКИЙ ТИПОГРАФИЧЕСКИЙ МАНИФЕСТ (WELCOME TO THE NEW FRONTIER...) -->
+  <section class="editorial-manifesto">
+    <h2 class="manifesto-heading">
+      <span class="manifesto-line-dark">ДОБРО ПОЖАЛОВАТЬ В НОВЫЙ СТАНДАРТ</span>
+      <span class="manifesto-line-light">СОЗДАНИЯ И ВЕРСТКИ EMAIL-РАССЫЛОК.</span>
+    </h2>
+  </section>
+
+  <!-- СЕКЦИЯ 4: ТРИ МОНОЛИТА НА КРЕМОВОМ ФОНЕ (Teal, Blue, Ochre) -->
+  <section class="monolith-section">
+    <div class="monolith-container">
+      <div class="monolith-grid">
+        <!-- Блок 1: Teal -->
+        <a href="/templates.html?filter=promo" class="monolith-card monolith-teal">
+          <div class="monolith-header">
+            <span class="monolith-tag">PROMO / 600PX</span>
+            <span class="monolith-num">01</span>
+          </div>
+          <div class="monolith-title">
+            Промо-кампании и сезонные акции
+          </div>
+          <div class="monolith-foot">
+            <span>Изучить шаблоны</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Блок 2: Blue -->
+        <a href="/templates.html?filter=business" class="monolith-card monolith-blue">
+          <div class="monolith-header">
+            <span class="monolith-tag">B2B / PARTNER</span>
+            <span class="monolith-num">02</span>
+          </div>
+          <div class="monolith-title">
+            Корпоративная и деловая переписка
+          </div>
+          <div class="monolith-foot">
+            <span>Изучить шаблоны</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Блок 3: Ochre -->
+        <a href="/templates.html?filter=event" class="monolith-card monolith-ochre">
+          <div class="monolith-header">
+            <span class="monolith-tag">EVENT / SUMMIT</span>
+            <span class="monolith-num">03</span>
+          </div>
+          <div class="monolith-title">
+            Конференции, вебинары и митапы
+          </div>
+          <div class="monolith-foot">
+            <span>Изучить шаблоны</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </a>
+      </div>
+
+      <div class="monolith-summary">
+        <a href="/templates.html" class="btn btn-blue">
+          <span>Все шаблоны</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <p>
+          Оцените разницу в отображении, когда каждое письмо собрано на надежной табличной архитектуре 
+          с фиксированной сеткой 600 px и нулевым риском визуальных артефактов.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 5: СТАТИСТИКА 100% В СВЕТЛО-ГОЛУБОМ БЛОКЕ (из референса) -->
+  <section class="metrics-section">
+    <div class="metrics-header">
+      Большинство писем ломаются в корпоративных почтовиках — мы гарантируем полную стабильность верстки.
+    </div>
+
+    <div class="metrics-display-box">
+      <div class="metrics-huge-num">100%</div>
+      <div class="metrics-caption">СТАБИЛЬНОСТЬ ОТОБРАЖЕНИЯ СЕТКИ</div>
+    </div>
+
+    <div class="metrics-columns">
+      <div class="metrics-col">
+        <h4>Табличные контейнеры VML</h4>
+        <p>
+          Специальная генерация кода с Microsoft Office спецификациями гарантирует отображение фоновых изображений, 
+          шрифтовых отступов и позиций в десктопном Outlook без искажений.
+        </p>
+      </div>
+      <div class="metrics-col">
+        <h4>Пиксельная точность 600×1200</h4>
+        <p>
+          Свободное позиционирование каждого элемента: перетаскивайте логотип, заголовки, текстовые блоки, 
+          кнопки и подвал мышью прямо на холсте с контролем координат X и Y.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 6: ДВУХКОЛОНОЧНЫЙ БЛОК (Методология) -->
+  <section class="method-section">
+    <div class="method-container">
+      <div class="method-left">
+        <h3>Методология сборки шаблонов</h3>
+        <p>
+          Мы исключили всё лишнее: нет громоздких фреймворков и случайных стилей. 
+          Каждый шаблон проходит валидацию на совместимость с HTML-стандартами электронных писем.
+        </p>
+        <a href="/templates.html" class="btn btn-outline">
+          <span>Выбрать готовый макет</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+
+      <div class="method-right-stack">
+        <div class="method-block method-block-teal">
+          <div>
+            <span>ЭТАП 01 / ПОЗИЦИОНИРОВАНИЕ</span>
+            <h4>Drag & Drop размещение</h4>
+          </div>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+        </div>
+
+        <div class="method-block method-block-ochre">
+          <div>
+            <span>ЭТАП 02 / ГЕНЕРАЦИЯ</span>
+            <h4>Экспорт чистого HTML-кода</h4>
+          </div>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ CTA ВНИЗУ -->
+  <section class="bottom-cta">
+    <h2>Начните создание вашего письма сейчас</h2>
+    <p>Выберите профессиональный шаблон из каталога или соберите макет с чистого листа в интерактивном редакторе.</p>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+      <a href="/templates.html" class="btn btn-blue" style="padding: 16px 36px; font-size: 0.95rem;">
+        <span>Перейти к шаблонам</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+      <a href="/editor.html?new=1" class="btn btn-outline" style="padding: 16px 32px; font-size: 0.95rem;">
+        <span>Чистый холст</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Футер -->
+  <footer>
+    <div class="footer-container">
+      <div>MailCraft / 600 • Система верстки и прототипирования HTML писем</div>
+      <div>Стандарт 600×1200 px • Outlook & Gmail Ready</div>
+    </div>
+  </footer>
+
+</body>
+</html>

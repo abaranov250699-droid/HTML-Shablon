@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог шаблонов — MailCraft 600</title>
+  <style>
+    /*
+      СТИЛЬ: Строгий швейцарский архитектурный брутализм (соответствует референсу)
+      - border-radius: 0px везде
+      - Четкие линии 1px solid без обводок и теней размытия
+      - Никаких стикеров и эмодзи, только векторные SVG
+    */
+    :root {
+      --bg-light: #ffffff;
+      --bg-cream: #f7f7f4;
+      --bg-blue: #1e50ff;
+      --bg-blue-dark: #1238b8;
+      --bg-teal: #0e4f5a;
+      --bg-ochre: #b86d29;
+      --bg-ice: #d8ecff;
+      --text-black: #0a0a0a;
+      --text-gray: #666666;
+      --text-light-gray: #a3a3a3;
+      --line-dark: #0a0a0a;
+      --line-gray: #e5e5df;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0 !important;
+      font-family: var(--font-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-black);
+      line-height: 1.45;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-hairline {
+      height: 3px;
+      background: var(--bg-blue);
+      width: 100%;
+    }
+
+    /* Навбар */
+    nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line-gray);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-black);
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--bg-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 24px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .btn-blue {
+      background: var(--bg-blue);
+      color: #ffffff;
+      border-color: var(--bg-blue);
+    }
+    .btn-blue:hover {
+      background: var(--bg-blue-dark);
+      border-color: var(--bg-blue-dark);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      color: var(--text-black);
+      border-color: var(--line-dark);
+    }
+    .btn-outline:hover {
+      background: var(--text-black);
+      color: #ffffff;
+    }
+
+    /* Верхний блок заголовка страницы */
+    .catalog-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line-gray);
+      padding: 60px 32px 40px 32px;
+    }
+
+    .catalog-header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .catalog-meta-tag {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--bg-blue);
+      margin-bottom: 12px;
+    }
+
+    .catalog-title {
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      color: var(--text-black);
+      margin-bottom: 12px;
+    }
+
+    .catalog-desc {
+      font-size: 1rem;
+      color: var(--text-gray);
+      max-width: 620px;
+    }
+
+    /* Фильтры в стиле четких табов */
+    .filter-wrapper {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line-gray);
+    }
+
+    .filter-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      overflow-x: auto;
+    }
+
+    .filter-btn {
+      padding: 18px 24px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-gray);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-black);
+    }
+
+    .filter-btn.active {
+      color: var(--bg-blue);
+      border-bottom-color: var(--bg-blue);
+    }
+
+    /* Сетка каталога */
+    .catalog-main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 32px 100px 32px;
+      flex: 1;
+      width: 100%;
+    }
+
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 36px;
+    }
+
+    /* Карточка шаблона — архитектурный прямоугольный монолит */
+    .template-card {
+      background: #ffffff;
+      border: 1px solid var(--line-dark);
+      box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .template-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.14);
+    }
+
+    .card-preview-container {
+      height: 240px;
+      background: #f0f0eb;
+      border-bottom: 1px solid var(--line-dark);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .card-tag {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: var(--text-black);
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+    }
+
+    .card-res {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #ffffff;
+      color: var(--text-black);
+      border: 1px solid var(--line-dark);
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 8px;
+    }
+
+    /* Миниатюра реального письма внутри */
+    .email-mini-sheet {
+      width: 220px;
+      height: 180px;
+      background: #ffffff;
+      border: 1px solid var(--line-dark);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .mini-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: inline-block;
+      width: fit-content;
+      padding: 2px 6px;
+      color: #ffffff;
+    }
+
+    .mini-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: -0.3px;
+    }
+
+    .mini-text {
+      font-size: 0.62rem;
+      line-height: 1.35;
+      color: #475569;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mini-btn {
+      margin-top: auto;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* Описание и кнопки карточки */
+    .card-content {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      color: var(--text-black);
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-gray);
+      line-height: 1.5;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      border-top: 1px solid var(--line-gray);
+      padding-top: 20px;
+    }
+
+    .btn-card-primary {
+      flex: 1;
+      padding: 12px 18px;
+      font-size: 0.8rem;
+    }
+
+    .btn-card-preview {
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 1px solid var(--line-dark);
+      color: var(--text-black);
+      cursor: pointer;
+    }
+    .btn-card-preview:hover {
+      background: var(--bg-cream);
+    }
+
+    /* Модальное окно предпросмотра */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.7);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-window {
+      background: #ffffff;
+      border: 2px solid var(--line-dark);
+      box-shadow: 16px 16px 0px rgba(0,0,0,0.3);
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-top {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--line-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-cream);
+    }
+
+    .modal-top h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-black);
+      line-height: 1;
+      padding: 4px 8px;
+    }
+
+    .modal-content-area {
+      padding: 36px;
+      overflow-y: auto;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+    }
+
+    .preview-sheet-full {
+      width: 540px;
+      border: 1px solid var(--line-dark);
+      padding: 30px;
+      box-shadow: 6px 6px 0px rgba(0,0,0,0.06);
+    }
+
+    .modal-bottom {
+      padding: 18px 28px;
+      border-top: 1px solid var(--line-dark);
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      background: var(--bg-cream);
+    }
+
+    footer {
+      background: #ffffff;
+      border-top: 1px solid var(--line-dark);
+      padding: 32px;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-hairline"></div>
+
+  <!-- Навигация без скруглений -->
+  <nav>
+    <div class="nav-container">
+      <a href="/" class="brand">
+        <div class="brand-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M4 4H20V10H10V14H18V20H4V4Z" fill="#ffffff" />
+          </svg>
+        </div>
+        <span>MailCraft / 600</span>
+      </a>
+
+      <div class="nav-actions">
+        <!-- Возврат на главную -->
+        <a href="/" class="btn btn-outline">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>На главную</span>
+        </a>
+
+        <!-- Создать с нуля -->
+        <a href="/editor.html?new=1" class="btn btn-blue">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Чистый холст</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Заголовок каталога -->
+  <header class="catalog-header">
+    <div class="catalog-header-inner">
+      <div>
+        <div class="catalog-meta-tag">БАЗА ГОТОВЫХ РЕШЕНИЙ / 600×1200 PX</div>
+        <h1 class="catalog-title">Каталог готовых шаблонов</h1>
+        <p class="catalog-desc">
+          Выберите структурированный архитектурный макет для вашей рассылки. 
+          Каждый шаблон мгновенно загружается в редактор для изменения текстов, ссылок, логотипов и Drag & Drop позиций.
+        </p>
+      </div>
+
+      <a href="/editor.html" class="btn btn-outline">
+        <span>Открыть пустой редактор</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Фильтры -->
+  <div class="filter-wrapper">
+    <div class="filter-container">
+      <button class="filter-btn active" data-filter="all">Все шаблоны</button>
+      <button class="filter-btn" data-filter="promo">Промо и скидки</button>
+      <button class="filter-btn" data-filter="business">B2B и Корпоративные</button>
+      <button class="filter-btn" data-filter="welcome">Онбординг</button>
+      <button class="filter-btn" data-filter="event">Конференции</button>
+      <button class="filter-btn" data-filter="digest">Дайджесты</button>
+    </div>
+  </div>
+
+  <!-- Сетка карточек шаблонов -->
+  <main class="catalog-main">
+    <div class="templates-grid" id="templatesGrid">
+      <!-- Генерируется из presets-data.js -->
+    </div>
+  </main>
+
+  <!-- Модальное окно предпросмотра -->
+  <div class="modal-overlay" id="previewModal">
+    <div class="modal-window">
+      <div class="modal-top">
+        <h3 id="modalTitle">Предпросмотр шаблона</h3>
+        <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-content-area">
+        <div class="preview-sheet-full" id="modalPreviewContent"></div>
+      </div>
+      <div class="modal-bottom">
+        <button class="btn btn-outline" id="modalCancelBtn">Закрыть</button>
+        <a href="#" class="btn btn-blue" id="modalUseBtn">
+          <span>Использовать шаблон</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Футер -->
+  <footer>
+    <div class="footer-inner">
+      <div>MailCraft / 600 • Каталог готовых макетов</div>
+      <div>Стандарт 600×1200 px • Outlook & Gmail Ready</div>
+    </div>
+  </footer>
+
+  <script src="/presets-data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('templatesGrid');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+
+      const previewModal = document.getElementById('previewModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalPreviewContent = document.getElementById('modalPreviewContent');
+      const modalCloseBtn = document.getElementById('modalCloseBtn');
+      const modalCancelBtn = document.getElementById('modalCancelBtn');
+      const modalUseBtn = document.getElementById('modalUseBtn');
+
+      // Проверка параметров URL (если перешли с landing.html?filter=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialFilter = urlParams.get('filter') || 'all';
+
+      filterBtns.forEach(btn => {
+        if (btn.getAttribute('data-filter') === initialFilter) {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        }
+      });
+
+      function renderCards(filter = 'all') {
+        grid.innerHTML = '';
+
+        const filtered = filter === 'all' 
+          ? PRESET_TEMPLATES 
+          : PRESET_TEMPLATES.filter(t => t.category === filter);
+
+        filtered.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'template-card';
+
+          const s = item.state;
+          const cardPaperBg = s.cardBgColor || '#ffffff';
+          const cardPaperColor = s.bodyColor || '#333333';
+
+          card.innerHTML = `
+            <div class="card-preview-container">
+              <span class="card-tag">${item.tag}</span>
+              <span class="card-res">600×1200 PX</span>
+
+              <div class="email-mini-sheet" style="background: ${cardPaperBg}; color: ${cardPaperColor};">
+                <span class="mini-badge" style="background: ${s.buttonBgColor}; color: ${s.buttonTextColor};">
+                  ${item.badgeText || 'MAIL'}
+                </span>
+                <div class="mini-title" style="color: ${s.headerColor};">${s.headerText}</div>
+                <div class="mini-text">${s.bodyText.replace(/\\n/g, '<br>')}</div>
+                <div class="mini-btn" style="background: ${s.buttonBgColor}; color: ${s.buttonTextColor};">
+                  ${s.buttonText}
+                </div>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <div>
+                <h3 class="card-title">${item.name}</h3>
+                <p class="card-desc">${item.desc}</p>
+              </div>
+
+              <div class="card-actions">
+                <button class="btn-card-preview" title="Быстрый просмотр" data-preview="${item.id}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+                <a href="/editor.html?preset=${item.id}" class="btn btn-blue btn-card-primary">
+                  <span>Выбрать этот шаблон</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          `;
+
+          const chooseBtn = card.querySelector('.btn-card-primary');
+          if (chooseBtn) {
+            chooseBtn.addEventListener('click', () => {
+              try {
+                localStorage.setItem('selected_preset_id', item.id);
+              } catch (e) {}
+            });
+          }
+
+          card.querySelector('.card-preview-container').addEventListener('click', () => {
+            openPreview(item);
+          });
+
+          card.querySelector('[data-preview]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            openPreview(item);
+          });
+
+          grid.appendChild(card);
+        });
+      }
+
+      function openPreview(item) {
+        modalTitle.textContent = item.name + ' [600×1200 PX]';
+        modalUseBtn.href = `/editor.html?preset=${item.id}`;
+        modalUseBtn.onclick = () => {
+          try {
+            localStorage.setItem('selected_preset_id', item.id);
+          } catch (e) {}
+        };
+
+        const s = item.state;
+        modalPreviewContent.style.background = s.cardBgColor || '#fff';
+        modalPreviewContent.style.color = s.bodyColor || '#1e293b';
+
+        modalPreviewContent.innerHTML = `
+          <div style="margin-bottom: 25px;">
+            <span style="display: inline-block; padding: 4px 10px; background: ${s.buttonBgColor}; color: ${s.buttonTextColor}; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">
+              ${item.badgeText || 'LOGO'}
+            </span>
+          </div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: ${s.headerColor}; text-align: ${s.headerAlign}; margin-bottom: 18px; text-transform: uppercase; letter-spacing: -0.5px;">
+            ${s.headerText}
+          </div>
+          <div style="font-size: 0.95rem; line-height: 1.6; color: ${s.bodyColor}; text-align: ${s.bodyAlign}; white-space: pre-line; margin-bottom: 28px;">
+            ${s.bodyText}
+          </div>
+          <div style="margin-bottom: 30px;">
+            <span style="display: inline-block; padding: 12px 24px; background: ${s.buttonBgColor}; color: ${s.buttonTextColor}; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">
+              ${s.buttonText}
+            </span>
+          </div>
+          <div style="font-size: 0.8rem; color: ${s.footerColor}; text-align: ${s.footerAlign}; white-space: pre-line; border-top: 1px solid var(--line-gray); padding-top: 16px;">
+            ${s.footerText}
+          </div>
+        `;
+
+        previewModal.classList.add('open');
+      }
+
+      function closeModal() {
+        previewModal.classList.remove('open');
+      }
+
+      modalCloseBtn.addEventListener('click', closeModal);
+      modalCancelBtn.addEventListener('click', closeModal);
+      previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) closeModal();
+      });
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.getAttribute('data-filter');
+          renderCards(filter);
+        });
+      });
+
+      renderCards(initialFilter);
+    });
+  </script>
+</body>
+</html>

@@ -328,8 +328,8 @@ app.get('/privacy-policy.pdf', (req, res) => {
   );
 });
 
-app.get(['/privacy', '/privacy/'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'privacy-policy.pdf'));
+app.get(['/privacy', '/privacy/', '/privacy.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'privacy.html'));
 });
 
 // Статические файлы (js, css, картинки) с кэшированием и без автоматической раздачи index.html на корень

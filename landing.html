@@ -133,101 +133,97 @@
       width: 100%;
     }
 
-    /* ==================== КНОПКИ С АНИМАЦИЯМИ ДВИЖЕНИЯ ==================== */
+    /* ==================== КНОПКИ С АНИМАЦИЕЙ ИЗ ВИДЕО FIGMA ==================== */
     .btn-motion {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       text-decoration: none;
       cursor: pointer;
-      overflow: hidden;
       position: relative;
       user-select: none;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                  box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                  background-color 0.2s ease,
-                  color 0.2s ease,
-                  border-color 0.2s ease;
+      border: 1.5px solid var(--color-black);
+      box-sizing: border-box;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
     }
 
     /* Черная кнопка (Default) */
     .btn-dark {
       background-color: var(--color-black);
       color: var(--color-white);
-      border: 1.5px solid var(--color-black);
     }
     .btn-dark .btn-label {
       font-size: 20px;
       line-height: 20px;
       letter-spacing: -1.6px;
       color: var(--color-white);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-dark .btn-dot {
-      width: 3px;
-      height: 3px;
-      background-color: var(--color-white);
-      border-radius: 50% !important;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
-    }
-
-    /* Анимация движения черной кнопки при наведении */
-    .btn-dark:hover {
-      transform: translate(-3px, -3px);
-      box-shadow: 4px 4px 0px rgba(14, 13, 13, 0.4);
-      background-color: #000000;
-    }
-    .btn-dark:hover .btn-dot {
-      transform: translateX(4px) scale(1.4);
-      background-color: #60a5fa; /* Акцентный всполох синего */
-    }
-    .btn-dark:hover .btn-label {
-      transform: translateX(-2px);
-    }
-    .btn-dark:active {
-      transform: translate(1px, 1px);
-      box-shadow: 1px 1px 0px rgba(14, 13, 13, 0.4);
     }
 
     /* Белая кнопка с рамкой */
     .btn-site-outline {
       background-color: var(--color-white);
       color: var(--color-black);
-      border: 1.5px solid var(--color-black);
     }
     .btn-site-outline .btn-label {
       font-size: 20px;
       line-height: 20px;
       letter-spacing: -1.6px;
       color: var(--color-black);
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+      transition: color 0.2s ease;
     }
-    .btn-site-outline .btn-dot {
-      width: 3px;
-      height: 3px;
-      background-color: var(--color-black);
-      border-radius: 50% !important;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
-    }
-
-    /* Анимация движения белой кнопки при наведении */
     .btn-site-outline:hover {
-      transform: translate(-3px, -3px);
-      box-shadow: 4px 4px 0px var(--color-black);
       background-color: var(--color-black);
+      color: var(--color-white);
     }
     .btn-site-outline:hover .btn-label {
       color: var(--color-white);
-      transform: translateX(-2px);
     }
-    .btn-site-outline:hover .btn-dot {
-      background-color: var(--color-white);
-      transform: translateX(4px) scale(1.4);
+
+    /* Иконка: плавная трансформация точки в стрелку-шеврон > при наведении (как в видео) */
+    .btn-icon {
+      position: relative;
+      width: 10px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
-    .btn-site-outline:active {
-      transform: translate(1px, 1px);
-      box-shadow: 1px 1px 0px var(--color-black);
+
+    .btn-dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background-color: currentColor;
+      border-radius: 50% !important;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-arrow {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      opacity: 0;
+      transform: translateX(-4px) scale(0.8);
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Анимация при наведении: точка исчезает, стрелка появляется */
+    .btn-motion:hover .btn-dot {
+      opacity: 0;
+      transform: scale(0) translateX(-3px);
+    }
+
+    .btn-motion:hover .btn-arrow {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+
+    .btn-motion:active {
+      transform: scale(0.985);
     }
 
     /* Специфические размеры кнопок из Figma */
@@ -811,7 +807,12 @@
 
         <a href="/editor?new=1" class="btn-motion btn-dark btn-menu-header" data-node-id="6:25" title="Создать новое письмо">
           <span class="btn-label">СОЗДАТЬ ПИСЬМО</span>
-          <span class="btn-dot"></span>
+          <span class="btn-icon">
+            <span class="btn-dot"></span>
+            <svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+            </svg>
+          </span>
         </a>
       </div>
     </header>
@@ -831,7 +832,12 @@
         </p>
         <a href="/editor" class="btn-motion btn-dark btn-hero" data-node-id="10:110">
           <span class="btn-label">СОЗДАТЬ HTML ПИСЬМО</span>
-          <span class="btn-dot"></span>
+          <span class="btn-icon">
+            <span class="btn-dot"></span>
+            <svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+            </svg>
+          </span>
         </a>
       </div>
     </section>
@@ -905,7 +911,12 @@
         <div>
           <a href="/templates" class="btn-motion btn-site-outline btn-site" data-node-id="18:543">
             <span class="btn-label">ВЫБРАТЬ ГОТОВЫЙ МАКЕТ</span>
-            <span class="btn-dot"></span>
+            <span class="btn-icon">
+              <span class="btn-dot"></span>
+              <svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+              </svg>
+            </span>
           </a>
         </div>
       </div>
@@ -934,11 +945,21 @@
         <div class="cta-buttons-row" data-node-id="18:599">
           <a href="/templates" class="btn-motion btn-site-outline btn-site" data-node-id="18:560">
             <span class="btn-label">ПЕРЕЙТИ К ШАБЛОНАМ</span>
-            <span class="btn-dot"></span>
+            <span class="btn-icon">
+              <span class="btn-dot"></span>
+              <svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+              </svg>
+            </span>
           </a>
           <a href="/editor?new=1" class="btn-motion btn-dark btn-site" data-node-id="18:574">
             <span class="btn-label">ЧИСТЫЙ ХОЛСТ</span>
-            <span class="btn-dot"></span>
+            <span class="btn-icon">
+              <span class="btn-dot"></span>
+              <svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+              </svg>
+            </span>
           </a>
         </div>
       </div>
@@ -957,7 +978,12 @@
           </a>
           <a href="/privacy-policy.pdf" download="Политика_обработки_персональных_данных.pdf" class="btn-motion btn-dark btn-footer" data-node-id="18:624" title="Скачать официальный PDF-документ политики">
             <span class="btn-label">СКАЧАТЬ</span>
-            <span class="btn-dot"></span>
+            <span class="btn-icon">
+              <span class="btn-dot"></span>
+              <svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+              </svg>
+            </span>
           </a>
         </div>
       </div>
@@ -1038,20 +1064,15 @@
 
       startSlider();
 
-      // 2. Интерактивный эффект движения для кнопок (Magnetic micro-movement)
-      document.querySelectorAll('.btn-motion').forEach(btn => {
-        btn.addEventListener('mousemove', (e) => {
-          const rect = btn.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
-          // Легкое микро-следование за курсором
-          const factor = 0.12;
-          btn.style.transform = `translate(${x * factor - 3}px, ${y * factor - 3}px)`;
-        });
-
-        btn.addEventListener('mouseleave', () => {
-          btn.style.transform = '';
-        });
+      // 2. Гарантия наличия анимации стрелки для всех кнопок с классом btn-motion
+      document.querySelectorAll('.btn-motion .btn-dot').forEach(dot => {
+        if (!dot.parentElement.classList.contains('btn-icon')) {
+          const wrap = document.createElement('span');
+          wrap.className = 'btn-icon';
+          dot.parentNode.insertBefore(wrap, dot);
+          wrap.appendChild(dot);
+          wrap.insertAdjacentHTML('beforeend', '<svg class="btn-arrow" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 1.5L6.5 7L1.5 12.5" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg>');
+        }
       });
     })();
   </script>

@@ -553,50 +553,101 @@
       background-size: 15px 15px;
     }
 
-    /* Figma-панель инструментов Zero Block */
-    .zero-block-topbar {
+    /* Боковое меню инструментов Zero Block (вертикальная линейка Figma) */
+    .zero-block-sidebar {
       position: absolute;
       top: 8px;
-      left: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(8px);
+      left: -68px;
+      width: 58px;
+      background: #ffffff;
       border: 1px solid var(--border-light);
-      padding: 5px 8px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      z-index: 35;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      padding: 8px 3px;
+      gap: 3px;
+      z-index: 45;
+      border-radius: 4px;
+      user-select: none;
     }
-    .zero-tool-group {
+    .zero-sidebar-brand {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-light);
+      width: 100%;
+    }
+    .zero-bolt {
+      font-size: 14px;
+      color: #f59e0b;
+    }
+    .zero-brand-text {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #0a0a0a;
+    }
+    .zero-sidebar-tools {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      width: 100%;
+      margin-top: 4px;
     }
     .zero-tool-btn {
-      padding: 4px 8px;
-      font-size: 0.72rem;
+      width: 100%;
+      padding: 5px 2px;
+      font-size: 0.65rem;
       font-weight: 700;
-      border: 1px solid var(--border-light);
-      background: #ffffff;
+      border: 1px solid transparent;
+      background: transparent;
       color: var(--text-main);
       cursor: pointer;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      gap: 2px;
+      border-radius: 4px;
       transition: all 0.15s;
+    }
+    .zero-tool-btn .tool-icon {
+      font-size: 13px;
+      line-height: 1;
+    }
+    .zero-tool-btn .tool-label {
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1;
     }
     .zero-tool-btn:hover {
       border-color: var(--accent);
       background: #f0f4ff;
       color: var(--accent);
+      transform: translateY(-1px);
     }
-    .zero-tool-btn.active {
-      background: #0a0a0a;
-      color: #ffffff;
-      border-color: #0a0a0a;
+    .zero-tool-btn.delete-tool:hover {
+      background: #fee2e2;
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+    .zero-sidebar-divider {
+      width: 80%;
+      height: 1px;
+      background: var(--border-light);
+      margin: 4px 0;
+    }
+
+    @media (max-width: 950px) {
+      .zero-block-sidebar {
+        left: 8px !important;
+        top: 8px !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(8px) !important;
+      }
     }
 
     /* Элементы Zero Block */
@@ -1045,6 +1096,48 @@
             <div>
               <div class="palette-item-label">⚡ Zero Block</div>
               <div style="font-size:0.65rem; opacity:0.8;">Figma-style дизайн редактор</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Боковое меню инструментов Zero Block в основном левом сайдбаре -->
+        <div id="zeroLeftSidebarTools" style="border: 1px solid var(--accent); background: #f8faff; padding: 10px; margin-bottom: 6px; border-radius: 4px;">
+          <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; color:var(--accent); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <span>⚡ Боковое меню слоев</span>
+            <span style="font-size:0.65rem; background:var(--accent); color:#fff; padding:2px 5px; border-radius:2px;">FIGMA</span>
+          </div>
+          <div class="block-palette-grid">
+            <div class="palette-item" data-zero-add="text" style="cursor:pointer;" title="Добавить текстовый слой (T)">
+              <span style="font-weight:800; font-size:15px;">T</span>
+              <span class="palette-item-label">Текст</span>
+            </div>
+            <div class="palette-item" data-zero-add="button" style="cursor:pointer;" title="Добавить кнопку">
+              <span>🔘</span>
+              <span class="palette-item-label">Кнопка</span>
+            </div>
+            <div class="palette-item" data-zero-add="rect" style="cursor:pointer;" title="Добавить бокс (R)">
+              <span>▢</span>
+              <span class="palette-item-label">Бокс</span>
+            </div>
+            <div class="palette-item" data-zero-add="circle" style="cursor:pointer;" title="Добавить круг (O)">
+              <span>○</span>
+              <span class="palette-item-label">Круг</span>
+            </div>
+            <div class="palette-item" data-zero-add="line" style="cursor:pointer;" title="Добавить линию (L)">
+              <span>—</span>
+              <span class="palette-item-label">Линия</span>
+            </div>
+            <div class="palette-item" data-zero-add="image" style="cursor:pointer;" title="Добавить фото">
+              <span>🖼</span>
+              <span class="palette-item-label">Фото</span>
+            </div>
+            <div class="palette-item" data-zero-add="icon" style="cursor:pointer;" title="Добавить иконку">
+              <span>★</span>
+              <span class="palette-item-label">Иконка</span>
+            </div>
+            <div class="palette-item" data-zero-add="badge" style="cursor:pointer;" title="Добавить тег">
+              <span>🏷</span>
+              <span class="palette-item-label">Тег</span>
             </div>
           </div>
         </div>
@@ -2365,24 +2458,67 @@
 
             return `
             <div class="zero-block-canvas ${s.showGrid !== false ? 'grid-bg' : ''}" style="height:${s.height || 420}px;">
-              <!-- Верхний Figma-тулбар Zero Block -->
-              <div class="zero-block-topbar">
-                <div class="zero-tool-group">
-                  <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; margin-right:4px;">⚡ Zero Figma</span>
-                  <button class="zero-tool-btn" data-zero-add="text" title="Текстовый слой (T)"><b>T</b> Текст</button>
-                  <button class="zero-tool-btn" data-zero-add="button" title="Интерактивная кнопка">🔘 Кнопка</button>
-                  <button class="zero-tool-btn" data-zero-add="rect" title="Прямоугольник / Контейнер (R)">▢ Бокс</button>
-                  <button class="zero-tool-btn" data-zero-add="circle" title="Круг / Бейдж (O)">○ Круг</button>
-                  <button class="zero-tool-btn" data-zero-add="line" title="Разделитель / Линия (L)">— Линия</button>
-                  <button class="zero-tool-btn" data-zero-add="image" title="Изображение">🖼 Фото</button>
-                  <button class="zero-tool-btn" data-zero-add="icon" title="Векторная иконка">★ Иконка</button>
-                  <button class="zero-tool-btn" data-zero-add="badge" title="Стикер / Тег">🏷 Тег</button>
+              <!-- Боковое меню инструментов Zero Block (вертикальная линейка Figma) -->
+              <div class="zero-block-sidebar" title="Боковое меню инструментов Zero Block">
+                <div class="zero-sidebar-brand">
+                  <span class="zero-bolt">⚡</span>
+                  <span class="zero-brand-text">FIGMA</span>
                 </div>
-                <div class="zero-tool-group">
-                  <button class="zero-tool-btn" id="btnToggleZeroGrid" title="Вкл/Выкл сетку"># Сетка</button>
-                  <button class="zero-tool-btn" id="btnZeroBringFront" title="Слой наверх">↑ Вверх</button>
-                  <button class="zero-tool-btn" id="btnZeroSendBack" title="Слой вниз">↓ Вниз</button>
-                  <button class="zero-tool-btn" id="btnZeroDeleteEl" style="color:var(--accent-red);" title="Удалить слой (Del)">🗑</button>
+                
+                <div class="zero-sidebar-tools">
+                  <button class="zero-tool-btn" data-zero-add="text" title="Текстовый слой (T)">
+                    <span class="tool-icon"><b>T</b></span>
+                    <span class="tool-label">Текст</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="button" title="Кнопка действия">
+                    <span class="tool-icon">🔘</span>
+                    <span class="tool-label">Кнопка</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="rect" title="Прямоугольник / Бокс (R)">
+                    <span class="tool-icon">▢</span>
+                    <span class="tool-label">Бокс</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="circle" title="Круг / Овал (O)">
+                    <span class="tool-icon">○</span>
+                    <span class="tool-label">Круг</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="line" title="Разделитель / Линия (L)">
+                    <span class="tool-icon">—</span>
+                    <span class="tool-label">Линия</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="image" title="Изображение">
+                    <span class="tool-icon">🖼</span>
+                    <span class="tool-label">Фото</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="icon" title="Векторная иконка">
+                    <span class="tool-icon">★</span>
+                    <span class="tool-label">Иконка</span>
+                  </button>
+                  <button class="zero-tool-btn" data-zero-add="badge" title="Стикер / Тег">
+                    <span class="tool-icon">🏷</span>
+                    <span class="tool-label">Тег</span>
+                  </button>
+                </div>
+
+                <div class="zero-sidebar-divider"></div>
+
+                <div class="zero-sidebar-tools">
+                  <button class="zero-tool-btn" id="btnToggleZeroGrid" title="Сетка (Вкл/Выкл)">
+                    <span class="tool-icon">#</span>
+                    <span class="tool-label">Сетка</span>
+                  </button>
+                  <button class="zero-tool-btn" id="btnZeroBringFront" title="Слой наверх">
+                    <span class="tool-icon">↑</span>
+                    <span class="tool-label">Вверх</span>
+                  </button>
+                  <button class="zero-tool-btn" id="btnZeroSendBack" title="Слой вниз">
+                    <span class="tool-icon">↓</span>
+                    <span class="tool-label">Вниз</span>
+                  </button>
+                  <button class="zero-tool-btn delete-tool" id="btnZeroDeleteEl" title="Удалить выбранный слой (Del)">
+                    <span class="tool-icon" style="color:var(--accent-red);">🗑</span>
+                    <span class="tool-label" style="color:var(--accent-red);">Удалить</span>
+                  </button>
                 </div>
               </div>
 
@@ -2656,6 +2792,11 @@
         if (b.getAttribute('data-id') === id) b.classList.add('selected');
         else b.classList.remove('selected');
       });
+      const selectedBlock = BuilderState.blocks.find(b => b.id === id);
+      const zeroSidebarEl = document.getElementById('zeroLeftSidebarTools');
+      if (zeroSidebarEl) {
+        zeroSidebarEl.style.display = (selectedBlock && selectedBlock.type === 'zero_block') ? 'block' : 'none';
+      }
       Inspector.render();
     }
 
@@ -3946,7 +4087,11 @@
       }
 
       CanvasRenderer.render();
-      Inspector.render();
+      if (BuilderState.selectedBlockId) {
+        switchActiveBlockClass(BuilderState.selectedBlockId);
+      } else {
+        Inspector.render();
+      }
       updateSpamScoreIndicator();
     });
   </script>

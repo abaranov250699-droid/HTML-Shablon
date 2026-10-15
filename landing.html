@@ -416,86 +416,35 @@
       width: 413px;
       height: 274px;
       background-color: var(--color-white);
-      padding: 25px;
+      padding: 0;
       position: relative;
       flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      display: block;
       box-sizing: border-box;
+      overflow: hidden;
     }
 
-    .card-top {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .card-logo-text {
-      font-size: 32px;
-      line-height: 32px;
-      letter-spacing: -2.56px;
-      font-weight: 400;
-    }
-
-    .card-heading {
-      font-size: 28px;
-      line-height: 30px;
-      letter-spacing: -1.6px;
-      font-weight: 700;
-      color: var(--color-black);
-    }
-
-    .card-description {
-      font-size: 15px;
-      line-height: 20px;
-      letter-spacing: -0.8px;
-      color: var(--color-black);
-      font-weight: 400;
-      max-width: 250px;
-    }
-
-    /* 3D тактильная кнопка внутри карточки шаблона (с физическим нажатием) */
-    .tactile-btn-wrapper {
-      position: relative;
-      width: 240px;
-      height: 62px;
-      margin-top: 10px;
-    }
-    .tactile-btn-base {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 240px;
-      height: 50px;
-      background-color: var(--color-white);
-      border: 1px solid #d4d4d4;
-    }
-    .tactile-btn-plate {
-      position: absolute;
-      left: 0;
-      top: 12px;
-      width: 240px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .carousel-card-link {
+      display: block;
+      width: 100%;
+      height: 100%;
       text-decoration: none;
       cursor: pointer;
-      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
     }
-    .tactile-btn-plate:hover {
-      transform: translateY(-4px);
+
+    .carousel-card-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
     }
-    .tactile-btn-plate:active {
-      transform: translateY(12px);
-    }
-    .tactile-btn-label {
-      font-size: 20px;
-      line-height: 20px;
-      letter-spacing: -1.6px;
-      color: var(--color-white);
-      white-space: nowrap;
+
+    .carousel-card-link:hover .carousel-card-img {
+      transform: scale(1.02);
+      filter: brightness(1.02);
     }
 
     /* Индикаторы слайдера */
@@ -927,70 +876,30 @@
               
               <!-- Карточка 1: Welcome -->
               <div class="carousel-card" data-node-id="14:176">
-                <div class="card-top">
-                  <div class="card-logo-text" style="color: #0e0d0d;" data-node-id="14:164">Логотип</div>
-                  <div class="card-heading" data-node-id="14:166">ДОБРО ПОЖАЛОВАТЬ НА ПЛАТФОРМУ</div>
-                  <div class="card-description" data-node-id="14:170">
-                    Ваш аккаунт успешно зарегистрирован и готов к работе. Чтобы начать использование на полную мощность
-                  </div>
-                </div>
-                <div class="tactile-btn-wrapper" data-node-id="14:174">
-                  <div class="tactile-btn-base"></div>
-                  <a href="/editor?preset=welcome" class="tactile-btn-plate" style="background-color: #0e0d0d;">
-                    <span class="tactile-btn-label">ПЕРЕЙТИ К НАСТРОЙКЕ</span>
-                  </a>
-                </div>
+                <a href="/editor?preset=welcome" class="carousel-card-link" title="Выбрать шаблон: Welcome">
+                  <img src="/assets/card-welcome.png" alt="Добро пожаловать на платформу" class="carousel-card-img">
+                </a>
               </div>
 
               <!-- Карточка 2: Персональное предложение -->
               <div class="carousel-card" data-node-id="15:177">
-                <div class="card-top">
-                  <div class="card-logo-text" style="color: #237823;" data-node-id="15:182">Логотип</div>
-                  <div class="card-heading" data-node-id="15:181">ПЕРСОНАЛЬНОЕ ПРЕДЛОЖЕНИЕ</div>
-                  <div class="card-description" data-node-id="15:180">
-                    Уважаемый партнер!<br>Наша команда подготовила для вас индивидуальные условия
-                  </div>
-                </div>
-                <div class="tactile-btn-wrapper" data-node-id="15:183">
-                  <div class="tactile-btn-base"></div>
-                  <a href="/editor?preset=promo_discount" class="tactile-btn-plate" style="background-color: #237823;">
-                    <span class="tactile-btn-label">ОЗНАКОМИТЬСЯ С ПРЕЗЕНТАЦИЕЙ</span>
-                  </a>
-                </div>
+                <a href="/editor?preset=promo_discount" class="carousel-card-link" title="Выбрать шаблон: Персональное предложение">
+                  <img src="/assets/card-promo.png" alt="Персональное предложение" class="carousel-card-img">
+                </a>
               </div>
 
               <!-- Карточка 3: Дайджест -->
               <div class="carousel-card" data-node-id="15:189">
-                <div class="card-top">
-                  <div class="card-logo-text" style="color: #0466c2;" data-node-id="15:194">Логотип</div>
-                  <div class="card-heading" data-node-id="15:193">ЕЖЕМЕСЯЧНЫЙ ДАЙЖДЕСТ</div>
-                  <div class="card-description" data-node-id="15:192">
-                    В этом выпуске аналитической сводки вы узнаете<br>---Динамика конверсий
-                  </div>
-                </div>
-                <div class="tactile-btn-wrapper" data-node-id="15:195">
-                  <div class="tactile-btn-base"></div>
-                  <a href="/editor?preset=digest" class="tactile-btn-plate" style="background-color: #0466c2;">
-                    <span class="tactile-btn-label">ВСЕ НОВОСТИ</span>
-                  </a>
-                </div>
+                <a href="/editor?preset=digest" class="carousel-card-link" title="Выбрать шаблон: Ежемесячный дайджест">
+                  <img src="/assets/card-digest.png" alt="Ежемесячный дайджест" class="carousel-card-img">
+                </a>
               </div>
 
               <!-- Карточка 4: Повтор Карточки 1 для бесшовного зацикливания -->
               <div class="carousel-card" data-node-id="15:201">
-                <div class="card-top">
-                  <div class="card-logo-text" style="color: #0e0d0d;" data-node-id="15:206">Логотип</div>
-                  <div class="card-heading" data-node-id="15:205">ДОБРО ПОЖАЛОВАТЬ НА ПЛАТФОРМУ</div>
-                  <div class="card-description" data-node-id="15:204">
-                    Ваш аккаунт успешно зарегистрирован и готов к работе. Чтобы начать использование на полную мощность
-                  </div>
-                </div>
-                <div class="tactile-btn-wrapper" data-node-id="15:207">
-                  <div class="tactile-btn-base"></div>
-                  <a href="/editor?preset=welcome" class="tactile-btn-plate" style="background-color: #0e0d0d;">
-                    <span class="tactile-btn-label">ПЕРЕЙТИ К НАСТРОЙКЕ</span>
-                  </a>
-                </div>
+                <a href="/editor?preset=welcome" class="carousel-card-link" title="Выбрать шаблон: Welcome">
+                  <img src="/assets/card-welcome.png" alt="Добро пожаловать на платформу" class="carousel-card-img">
+                </a>
               </div>
 
             </div>

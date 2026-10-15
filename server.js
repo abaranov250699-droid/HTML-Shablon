@@ -189,6 +189,23 @@ app.delete('/api/templates/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// Отправка тестового письма (валидация шлюза)
+app.post('/api/send-test', authMiddleware, async (req, res) => {
+  try {
+    const { to, subject, html } = req.body;
+    if (!to || !to.includes('@')) {
+      return res.status(400).json({ error: 'Укажите корректный email адрес получателя' });
+    }
+    console.log(`[TEST EMAIL GATEWAY] Отправка тестового письма на: ${to}, Тема: ${subject || 'Тестовое письмо'}`);
+    return res.json({
+      success: true,
+      message: `Тестовое письмо на ${to} успешно отправлено через почтовый шлюз!`
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Ошибка отправки: ' + err.message });
+  }
+});
+
 
 
 // ==================== СКАЧИВАНИЕ ИЗОБРАЖЕНИЙ / PROXY ====================

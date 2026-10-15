@@ -54,11 +54,10 @@
       width: 100%;
     }
 
-    /* Базовая центрированная сетка 1440px */
+    /* Базовая центрированная сетка */
     .figma-page {
       width: 100%;
-      max-width: 1440px;
-      margin: 0 auto;
+      margin: 0;
       position: relative;
       background-color: var(--color-white);
     }
@@ -66,6 +65,8 @@
     /* ==================== 1. HEADER (100px) ==================== */
     header.figma-header {
       width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
       height: 100px;
       background-color: var(--color-white);
       display: flex;
@@ -74,6 +75,7 @@
       padding: 0 120px;
       position: relative;
       z-index: 50;
+      box-sizing: border-box;
     }
 
     .header-logo-link {
@@ -254,14 +256,15 @@
     /* ==================== 2. HERO SECTION ==================== */
     section.figma-hero {
       width: 100%;
+      max-width: 1440px;
+      margin: 80px auto 0 auto; /* Отступ от Header 80px, снизу к Pattern отступа нет */
       min-height: 538px;
-      margin-top: 80px;
-      margin-bottom: 80px;
-      padding: 0 120px;
+      padding: 0 120px 80px 120px;
       display: flex;
       align-items: flex-start;
-      gap: 20px;
+      gap: 30px;
       position: relative;
+      box-sizing: border-box;
     }
 
     /* Размытый интерактивный код-блок слева */
@@ -305,57 +308,68 @@
 
     /* Правая колонка Hero */
     .hero-content {
-      width: 793px;
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 40px;
-      flex-shrink: 0;
     }
 
     .hero-title {
-      font-size: 120px;
-      line-height: 100px;
-      letter-spacing: -9.6px;
+      font-size: 110px; /* Размер 110px по запросу пользователя */
+      line-height: 105px;
+      letter-spacing: -7px;
       color: var(--color-black);
       font-weight: 400;
       width: 100%;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: break-word;
     }
 
     .hero-subtitle {
       font-size: 32px;
-      line-height: 30px;
+      line-height: 40px; /* Скорректировано для исключения наслоения строк */
       letter-spacing: -2.56px;
       color: var(--color-black);
       font-weight: 400;
       width: 100%;
+      max-width: 790px;
     }
 
-    /* ==================== 3. PATTERN SECTION (ЧЕРНЫЙ БЛОК) ==================== */
+    /* ==================== 3. PATTERN SECTION (ЧЕРНЫЙ БЛОК НА ВСЮ ШИРИНУ) ==================== */
     section.figma-pattern {
       width: 100%;
-      height: 605px;
-      background-color: var(--color-black);
+      min-height: 605px;
+      background-color: var(--color-black); /* Фон на всю ширину экрана */
       overflow: hidden;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-top: 0; /* Без отступа от Hero */
+      margin-bottom: 80px; /* Отступ 80px до следующей секции */
+      padding: 80px 0;
+      box-sizing: border-box;
     }
 
     .pattern-inner {
-      width: 1200px;
-      height: 400px;
+      width: 100%;
+      max-width: 1440px;
+      padding: 0 120px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       position: relative;
+      box-sizing: border-box;
+      margin: 0 auto;
     }
 
     .pattern-title {
-      width: 773px;
-      font-size: 96px;
-      line-height: 100px;
-      letter-spacing: -7.68px;
+      width: 700px;
+      max-width: 58%;
+      font-size: 88px;
+      line-height: 94px;
+      letter-spacing: -6px;
       color: var(--color-white);
       font-weight: 400;
       word-break: break-word;
@@ -366,13 +380,13 @@
       display: flex;
       flex-direction: column;
       gap: 37px;
+      flex-shrink: 0;
     }
 
     .pattern-subtitle {
-      width: 396px;
-      margin-left: 17px;
+      width: 100%;
       font-size: 32px;
-      line-height: 30px;
+      line-height: 38px;
       letter-spacing: -2.56px;
       color: var(--color-white);
       font-weight: 400;
@@ -390,7 +404,7 @@
 
     .carousel-track {
       display: flex;
-      width: 1772px; /* 4 карточки по 413px + gap/offset */
+      width: 1772px; /* 4 карточки по 413px */
       height: 274px;
       position: absolute;
       left: 0;
@@ -408,23 +422,24 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      box-sizing: border-box;
     }
 
     .card-top {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .card-logo-text {
       font-size: 32px;
-      line-height: 30px;
+      line-height: 32px;
       letter-spacing: -2.56px;
       font-weight: 400;
     }
 
     .card-heading {
-      font-size: 32px;
+      font-size: 28px;
       line-height: 30px;
       letter-spacing: -1.6px;
       font-weight: 700;
@@ -432,7 +447,7 @@
     }
 
     .card-description {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 20px;
       letter-spacing: -0.8px;
       color: var(--color-black);
@@ -506,26 +521,30 @@
     /* ==================== 4. SPACE SECTION (МЕТОДОЛОГИЯ) ==================== */
     section.figma-methodology {
       width: 100%;
-      height: 544px;
+      max-width: 1440px;
+      margin: 0 auto 80px auto; /* 80px отступ до CTA */
+      min-height: 544px;
       padding: 0 120px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
       background-color: var(--color-white);
+      box-sizing: border-box;
     }
 
     .methodology-left {
       width: 747px;
+      max-width: 60%;
       display: flex;
       flex-direction: column;
       gap: 30px;
     }
 
     .methodology-title {
-      font-size: 96px;
-      line-height: 100px;
-      letter-spacing: -7.68px;
+      font-size: 88px;
+      line-height: 94px;
+      letter-spacing: -6px;
       color: var(--color-black);
       font-weight: 400;
       word-break: break-word;
@@ -533,11 +552,12 @@
 
     .methodology-text {
       font-size: 32px;
-      line-height: 30px;
+      line-height: 40px; /* Исключено наслоение строк */
       letter-spacing: -2.56px;
       color: var(--color-black);
       font-weight: 400;
-      width: 632px;
+      width: 100%;
+      max-width: 632px;
     }
 
     .methodology-right-box {
@@ -574,9 +594,9 @@
     }
 
     .step-title {
-      font-size: 32px;
-      line-height: 30px;
-      letter-spacing: -2.56px;
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: -2px;
       color: var(--color-black);
       font-weight: 400;
     }
@@ -584,38 +604,43 @@
     /* ==================== 5. SPACE 2 SECTION (CTA ПРИЗЫВ) ==================== */
     section.figma-cta {
       width: 100%;
-      height: 454px;
+      max-width: 1440px;
+      margin: 0 auto 80px auto; /* 80px отступ до Footer */
+      min-height: 454px;
       padding: 0 120px;
       display: flex;
       align-items: center;
       position: relative;
       background-color: var(--color-white);
+      box-sizing: border-box;
     }
 
     .cta-content {
-      width: 747px;
+      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 30px;
     }
 
     .cta-title {
-      font-size: 96px;
-      line-height: 100px;
-      letter-spacing: -7.68px;
+      font-size: 84px;
+      line-height: 90px;
+      letter-spacing: -5px;
       color: var(--color-black);
       font-weight: 400;
-      width: 975px;
+      max-width: 975px;
+      width: 100%;
       word-break: break-word;
     }
 
     .cta-subtitle {
       font-size: 32px;
-      line-height: 30px;
+      line-height: 40px; /* Исключено наслоение строк */
       letter-spacing: -2.56px;
       color: var(--color-black);
       font-weight: 400;
-      width: 632px;
+      max-width: 632px;
+      width: 100%;
     }
 
     .cta-buttons-row {
@@ -627,14 +652,24 @@
     /* ==================== 6. FOOTER ==================== */
     footer.figma-footer {
       width: 100%;
-      height: 146px;
       border-top: 1.5px solid var(--color-black);
+      background-color: var(--color-white);
+      margin-top: 0;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .footer-inner {
+      width: 100%;
+      max-width: 1440px;
+      min-height: 146px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 120px;
-      position: relative;
-      background-color: var(--color-white);
+      box-sizing: border-box;
     }
 
     .footer-logo-link {
@@ -664,9 +699,9 @@
     }
 
     .footer-privacy-link {
-      font-size: 32px;
-      line-height: 30px;
-      letter-spacing: -2.56px;
+      font-size: 30px;
+      line-height: 36px;
+      letter-spacing: -2px;
       color: var(--color-black);
       text-decoration: underline;
       transition: color 0.15s ease;
@@ -681,41 +716,33 @@
       section.figma-hero,
       section.figma-methodology,
       section.figma-cta,
-      footer.figma-footer {
+      .footer-inner {
         padding-left: 40px;
         padding-right: 40px;
       }
       .pattern-inner {
-        width: 100%;
         padding: 0 40px;
       }
       .hero-title {
-        font-size: 84px;
-        line-height: 80px;
+        font-size: 80px;
+        line-height: 82px;
       }
       .pattern-title,
       .methodology-title,
       .cta-title {
-        font-size: 72px;
-        line-height: 75px;
-        width: 100%;
-      }
-      .cta-title {
-        width: 100%;
+        font-size: 68px;
+        line-height: 72px;
       }
       .hero-content {
         width: 100%;
       }
       .pattern-title {
-        width: 60%;
+        width: 55%;
+        max-width: 55%;
       }
-      .methodology-left,
-      .cta-content {
-        width: 60%;
-      }
-      .methodology-text,
-      .cta-subtitle {
-        width: 100%;
+      .methodology-left {
+        width: 55%;
+        max-width: 55%;
       }
     }
 
@@ -1037,18 +1064,20 @@
 
     <!-- 6. FOOTER -->
     <footer class="figma-footer" data-node-id="18:610">
-      <a href="/" class="footer-logo-link" title="HT MAIL">
-        <img src="/assets/logo-footer.svg" alt="HT MAIL Logo Footer" class="footer-logo-img">
-      </a>
+      <div class="footer-inner">
+        <a href="/" class="footer-logo-link" title="HT MAIL">
+          <img src="/assets/logo-footer.svg" alt="HT MAIL Logo Footer" class="footer-logo-img">
+        </a>
 
-      <div class="footer-right" data-node-id="18:642">
-        <a href="/privacy" class="footer-privacy-link" data-node-id="18:611">
-          Политика обработки персональных данных
-        </a>
-        <a href="/privacy-policy.pdf" download="Политика_обработки_персональных_данных.pdf" class="btn-motion btn-dark btn-footer" data-node-id="18:624" title="Скачать официальный PDF-документ политики">
-          <span class="btn-label">СКАЧАТЬ</span>
-          <span class="btn-dot"></span>
-        </a>
+        <div class="footer-right" data-node-id="18:642">
+          <a href="/privacy" class="footer-privacy-link" data-node-id="18:611">
+            Политика обработки персональных данных
+          </a>
+          <a href="/privacy-policy.pdf" download="Политика_обработки_персональных_данных.pdf" class="btn-motion btn-dark btn-footer" data-node-id="18:624" title="Скачать официальный PDF-документ политики">
+            <span class="btn-label">СКАЧАТЬ</span>
+            <span class="btn-dot"></span>
+          </a>
+        </div>
       </div>
     </footer>
 
@@ -1061,20 +1090,24 @@
       const track = document.getElementById('carouselTrack');
       const container = document.getElementById('carouselContainer');
       const dots = document.querySelectorAll('.carousel-dot');
-      const cardWidth = 413;
       let currentIndex = 0;
       let slideTimer = null;
       let isPaused = false;
 
+      function getCardWidth() {
+        return container ? container.offsetWidth : 413;
+      }
+
       function goToSlide(index, animate = true) {
         if (!track) return;
         currentIndex = index;
+        const width = getCardWidth();
         if (!animate) {
           track.style.transition = 'none';
         } else {
           track.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
         }
-        track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        track.style.transform = `translateX(-${currentIndex * width}px)`;
 
         // Синхронизация индикаторов
         dots.forEach((dot, i) => {

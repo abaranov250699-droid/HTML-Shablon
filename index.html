@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Конструктор писем — MailCraft</title>
+  <title>Конструктор писем — MailCraft (Figma & Tilda style)</title>
   <script src="/presets-data.js"></script>
   <style>
     :root {
@@ -38,7 +38,19 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      user-select: none;
+    }
+
+    /* Исправление юзабилити текста: контент редактируется мгновенно одним кликом без зажатия */
+    [contenteditable="true"] {
+      user-select: text !important;
+      -webkit-user-select: text !important;
+      cursor: text !important;
+      outline: none;
+      min-height: 1em;
+    }
+    [contenteditable="true"]:focus {
+      outline: 1px dashed var(--accent) !important;
+      background: rgba(30, 80, 255, 0.04);
     }
 
     /* ================= ВЕРХНЯЯ ПАНЕЛЬ (HEADER) ================= */
@@ -65,7 +77,7 @@
       align-items: center;
       gap: 8px;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-main);
       text-decoration: none;
       padding: 6px 10px;
@@ -482,17 +494,6 @@
       height: 14px;
     }
 
-    /* Инлайн редактирование текста */
-    [contenteditable="true"] {
-      outline: none;
-      cursor: text;
-    }
-    [contenteditable="true"]:focus {
-      outline: 1px dashed var(--accent);
-      outline-offset: 2px;
-      background: rgba(30, 80, 255, 0.03);
-    }
-
     /* Плавающий WYSIWYG тулбар форматирования */
     .floating-text-toolbar {
       position: fixed;
@@ -536,61 +537,135 @@
       cursor: pointer;
     }
 
-    /* ================= ZERO BLOCK (СВОБОДНЫЙ ХОЛСТ) ================= */
+    /* ================= ZERO BLOCK: FIGMA-STYLE ДИЗАЙН-РЕДАКТОР ================= */
     .zero-block-canvas {
       position: relative;
       width: 100%;
-      height: 380px;
+      height: 420px;
       background: #ffffff;
       overflow: hidden;
       user-select: none;
     }
     .zero-block-canvas.grid-bg {
       background-image: 
-        linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-      background-size: 20px 20px;
+        linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+      background-size: 15px 15px;
     }
+
+    /* Figma-панель инструментов Zero Block */
     .zero-block-topbar {
       position: absolute;
       top: 8px;
       left: 8px;
-      background: rgba(255,255,255,0.95);
+      right: 8px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
       border: 1px solid var(--border-light);
-      padding: 4px 8px;
+      padding: 5px 8px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 6px;
-      z-index: 25;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      z-index: 35;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
+    .zero-tool-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .zero-tool-btn {
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid var(--border-light);
+      background: #ffffff;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+    .zero-tool-btn:hover {
+      border-color: var(--accent);
+      background: #f0f4ff;
+      color: var(--accent);
+    }
+    .zero-tool-btn.active {
+      background: #0a0a0a;
+      color: #ffffff;
+      border-color: #0a0a0a;
+    }
+
+    /* Элементы Zero Block */
     .zero-element {
       position: absolute;
       cursor: move;
-      outline: 1px solid transparent;
+      outline: 1.5px solid transparent;
       user-select: none;
+      box-sizing: border-box;
     }
     .zero-element:hover {
-      outline: 1px dashed var(--accent);
+      outline: 1.5px dashed var(--accent);
     }
     .zero-element.active {
-      outline: 2px solid var(--accent);
+      outline: 2px solid var(--accent) !important;
       z-index: 100 !important;
     }
-    .zero-resize-handle {
+
+    /* Бейдж координат и размеров (W x H | X, Y) */
+    .zero-coords-badge {
       position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #ffffff;
-      border: 2px solid var(--accent);
-      right: -4px;
-      bottom: -4px;
-      cursor: se-resize;
+      bottom: -22px;
+      left: 0;
+      background: #0a0a0a;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 2px;
+      white-space: nowrap;
+      pointer-events: none;
       display: none;
+      z-index: 110;
     }
-    .zero-element.active .zero-resize-handle {
+    .zero-element.active .zero-coords-badge {
       display: block;
     }
+
+    /* 8 маркеров изменения размера (Figma Handles) */
+    .handle-nw, .handle-tc, .handle-tr,
+    .handle-mr, .handle-br, .handle-bc,
+    .handle-bl, .handle-ml {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: #ffffff;
+      border: 1.5px solid var(--accent);
+      display: none;
+      z-index: 105;
+    }
+    .zero-element.active .handle-nw,
+    .zero-element.active .handle-tc,
+    .zero-element.active .handle-tr,
+    .zero-element.active .handle-mr,
+    .zero-element.active .handle-br,
+    .zero-element.active .handle-bc,
+    .zero-element.active .handle-bl,
+    .zero-element.active .handle-ml {
+      display: block;
+    }
+
+    .handle-nw { top: -4px; left: -4px; cursor: nwse-resize; }
+    .handle-tc { top: -4px; left: calc(50% - 3.5px); cursor: ns-resize; }
+    .handle-tr { top: -4px; right: -4px; cursor: nesw-resize; }
+    .handle-mr { top: calc(50% - 3.5px); right: -4px; cursor: ew-resize; }
+    .handle-br { bottom: -4px; right: -4px; cursor: nwse-resize; }
+    .handle-bc { bottom: -4px; left: calc(50% - 3.5px); cursor: ns-resize; }
+    .handle-bl { bottom: -4px; left: -4px; cursor: nesw-resize; }
+    .handle-ml { top: calc(50% - 3.5px); left: -4px; cursor: ew-resize; }
 
     /* ================= ПРАВАЯ ПАНЕЛЬ: ИНСПЕКТОР СВОЙСТВ ================= */
     .sidebar-right {
@@ -645,11 +720,14 @@
       border-bottom: 1px solid var(--border-light);
     }
     .prop-section-title {
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .prop-row {
@@ -696,6 +774,33 @@
       font-size: 0.8rem;
       font-family: monospace;
       text-transform: uppercase;
+    }
+
+    /* Сетка геометрии X, Y, W, H */
+    .figma-geo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .figma-geo-box {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-light);
+      padding: 3px 6px;
+      background: #ffffff;
+    }
+    .figma-geo-box span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      width: 20px;
+    }
+    .figma-geo-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 0.82rem;
+      text-align: right;
     }
 
     /* Сетка отступов (padding 4 стороны) */
@@ -776,7 +881,7 @@
       background: var(--bg-subtle);
     }
 
-    /* Модальное окно спам-анализатора */
+    /* Спам-модалка */
     .spam-score-display {
       display: flex;
       align-items: center;
@@ -810,25 +915,13 @@
       flex-direction: column;
       gap: 4px;
     }
-    .spam-issue-card.danger {
-      border-left: 4px solid var(--accent-red);
-    }
-    .spam-issue-card.warning {
-      border-left: 4px solid var(--accent-amber);
-    }
-    .spam-issue-card.good {
-      border-left: 4px solid var(--accent-green);
-    }
-    .spam-issue-title {
-      font-weight: 800;
-      font-size: 0.88rem;
-    }
-    .spam-issue-rec {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
+    .spam-issue-card.danger { border-left: 4px solid var(--accent-red); }
+    .spam-issue-card.warning { border-left: 4px solid var(--accent-amber); }
+    .spam-issue-card.good { border-left: 4px solid var(--accent-green); }
+    .spam-issue-title { font-weight: 800; font-size: 0.88rem; }
+    .spam-issue-rec { font-size: 0.82rem; color: var(--text-muted); }
 
-    /* Quick block picker popover */
+    /* Попап быстрого выбора блока */
     .quick-picker-popover {
       position: absolute;
       background: #ffffff;
@@ -839,9 +932,7 @@
       width: 320px;
       display: none;
     }
-    .quick-picker-popover.open {
-      display: block;
-    }
+    .quick-picker-popover.open { display: block; }
     .quick-picker-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -874,12 +965,6 @@
     .toast.show {
       transform: translateY(0);
       opacity: 1;
-    }
-
-    /* Мобильный рендер стилей письма */
-    @media (max-width: 900px) {
-      .sidebar-left { width: 220px; }
-      .sidebar-right { width: 260px; }
     }
   </style>
 </head>
@@ -939,7 +1024,7 @@
     </div>
   </header>
 
-  <!-- ================= РАБОЧАЯ ОБЛАСТЬ (3 КОЛОНКИ) ================= -->
+  <!-- ================= РАБОЧАЯ ОБЛАСТЬ ================= -->
   <div class="app-workspace">
 
     <!-- ЛЕВАЯ ПАНЕЛЬ: БИБЛИОТЕКА БЛОКОВ -->
@@ -959,7 +1044,7 @@
             </div>
             <div>
               <div class="palette-item-label">⚡ Zero Block</div>
-              <div style="font-size:0.65rem; opacity:0.8;">Свободный холст</div>
+              <div style="font-size:0.65rem; opacity:0.8;">Figma-style дизайн редактор</div>
             </div>
           </div>
         </div>
@@ -1052,7 +1137,7 @@
     <!-- ЦЕНТРАЛЬНЫЙ ХОЛСТ -->
     <main class="canvas-viewport" id="canvasViewport">
       <div class="canvas-container" id="emailCanvas">
-        <!-- Блоки будут динамически отрисовываться здесь -->
+        <!-- Блоки отрисовываются динамически -->
       </div>
     </main>
 
@@ -1064,7 +1149,7 @@
       </div>
 
       <div class="inspector-content" id="inspectorContent">
-        <!-- Содержимое инспектора отрисовывается динамически -->
+        <!-- Инспектор отрисовывается динамически -->
       </div>
     </aside>
 
@@ -1115,7 +1200,7 @@
       <button class="btn" data-add-type="columns_2">📐 2 Колонки</button>
       <button class="btn" data-add-type="product_card">🛍 Товар</button>
       <button class="btn" data-add-type="divider">➖ Разделитель</button>
-      <button class="btn" data-add-type="zero_block" style="grid-column: 1 / -1; background:#0a0a0a; color:#fff;">⚡ Zero Block</button>
+      <button class="btn" data-add-type="zero_block" style="grid-column: 1 / -1; background:#0a0a0a; color:#fff;">⚡ Zero Block (Figma)</button>
     </div>
   </div>
 
@@ -1236,8 +1321,6 @@
       selectedZeroElementId: null,
       activeTab: 'block', // 'block' | 'email'
       viewMode: 'desktop', // 'desktop' | 'mobile'
-      history: [],
-      historyIndex: -1,
       quickPickerTargetIndex: 0
     };
 
@@ -1252,6 +1335,21 @@
       { name: 'Trebuchet MS', val: "'Trebuchet MS', sans-serif" },
       { name: 'Courier New', val: "'Courier New', Courier, monospace" }
     ];
+
+    // SVG иконки для Zero Block
+    const ZERO_ICONS = {
+      star: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>',
+      heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+      fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.04-2.52-1.92-3.32-.42-.38-.82-.74-1.08-1.18-.3.44-.7.8-1.12 1.18-.86.8-1.88 1.69-1.88 3.32zM12 2c.86 2.5 3 4.5 4.5 7 1.5 2.5 1.5 5.5.5 8s-3.5 4-6 4-5-1.5-6-4 .5-5.5 2-8c1.5-2.5 3-4.5 5-7z"/></svg>',
+      flash: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>',
+      shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+      bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+      arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'
+    };
 
     // ================= БИБЛИОТЕКА ФАБРИК БЛОКОВ =================
     const BlockFactory = {
@@ -1475,46 +1573,94 @@
               type: 'zero_block',
               settings: {
                 bg: '#ffffff',
-                height: 360,
-                borderRadius: 0
+                height: 420,
+                borderRadius: 0,
+                showGrid: true
               },
               data: {
                 elements: [
                   {
                     id: 'ze_' + Math.random().toString(36).substr(2, 6),
+                    type: 'rect',
+                    x: 30,
+                    y: 30,
+                    width: 540,
+                    height: 360,
+                    fill: '#f8fafc',
+                    strokeColor: '#e2e8f0',
+                    strokeWidth: 1,
+                    strokeStyle: 'solid',
+                    radius: 8,
+                    opacity: 1,
+                    shadow: false,
+                    zIndex: 1
+                  },
+                  {
+                    id: 'ze_' + Math.random().toString(36).substr(2, 6),
+                    type: 'badge',
+                    x: 60,
+                    y: 60,
+                    width: 120,
+                    height: 28,
+                    text: '★ FIGMA DESIGN',
+                    bgColor: '#1e50ff',
+                    textColor: '#ffffff',
+                    radius: 4,
+                    fontSize: 11,
+                    zIndex: 2
+                  },
+                  {
+                    id: 'ze_' + Math.random().toString(36).substr(2, 6),
                     type: 'text',
-                    x: 40,
-                    y: 40,
-                    width: 320,
+                    x: 60,
+                    y: 105,
+                    width: 480,
                     height: 80,
-                    content: '<h2 style="margin:0; font-family:Arial, sans-serif; font-size:26px; font-weight:800; color:#0a0a0a;">СВОБОДНЫЙ ZERO BLOCK</h2><p style="margin:5px 0 0 0; font-size:14px; color:#666;">Перемещайте любые элементы мышью прямо по холсту</p>',
+                    content: '<h2 style="margin:0; font-family:Arial, sans-serif; font-size:24px; font-weight:800; color:#0a0a0a;">СВОБОДНЫЙ ДИЗАЙН-РЕДАКТОР</h2><p style="margin:6px 0 0 0; font-size:14px; color:#475569; line-height:1.5;">Создавайте любые композиции: кнопки, фигуры, бейджи, линии и векторные иконки с полным контролем положения и размеров.</p>',
+                    zIndex: 3
+                  },
+                  {
+                    id: 'ze_' + Math.random().toString(36).substr(2, 6),
+                    type: 'line',
+                    x: 60,
+                    y: 200,
+                    width: 480,
+                    height: 2,
+                    strokeColor: '#cbd5e1',
+                    strokeWidth: 2,
+                    strokeStyle: 'solid',
                     zIndex: 2
                   },
                   {
                     id: 'ze_' + Math.random().toString(36).substr(2, 6),
                     type: 'button',
-                    x: 40,
-                    y: 150,
-                    width: 200,
+                    x: 60,
+                    y: 230,
+                    width: 220,
                     height: 48,
-                    text: 'Узнать больше',
+                    text: 'Открыть презентацию',
                     url: 'https://example.com',
-                    bgColor: '#1e50ff',
+                    bgColor: '#0a0a0a',
                     textColor: '#ffffff',
-                    borderRadius: 0,
+                    radius: 4,
                     fontSize: 14,
-                    zIndex: 3
+                    strokeColor: '',
+                    strokeWidth: 0,
+                    zIndex: 4
                   },
                   {
                     id: 'ze_' + Math.random().toString(36).substr(2, 6),
-                    type: 'image',
-                    x: 380,
-                    y: 40,
-                    width: 180,
-                    height: 240,
-                    url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=360&auto=format&fit=crop&q=80',
-                    alt: 'Zero Block Visual',
-                    zIndex: 1
+                    type: 'circle',
+                    x: 320,
+                    y: 230,
+                    width: 48,
+                    height: 48,
+                    fill: '#10b981',
+                    strokeColor: '#ffffff',
+                    strokeWidth: 2,
+                    text: '✓',
+                    textColor: '#ffffff',
+                    zIndex: 4
                   }
                 ]
               }
@@ -1588,7 +1734,7 @@
                 const temp = document.createElement('div');
                 temp.innerHTML = el.content || '';
                 allText += ' ' + temp.textContent;
-              } else if (el.type === 'button') {
+              } else if (el.type === 'button' || el.type === 'badge') {
                 allText += ' ' + (el.text || '');
               } else if (el.type === 'image') {
                 imageCount++;
@@ -1598,7 +1744,7 @@
           }
         });
 
-        // 1. Проверка наличия ссылки на отписку (КРИТИЧЕСКИЙ ФАКТОР)
+        // 1. Проверка наличия ссылки на отписку
         const lowerAll = allText.toLowerCase();
         if (!hasUnsubscribe && !lowerAll.includes('отпис') && !lowerAll.includes('unsubscribe')) {
           score -= 2.5;
@@ -1618,9 +1764,7 @@
         // 2. Проверка стоп-слов
         const foundStopWords = [];
         this.stopWords.forEach(word => {
-          if (lowerAll.includes(word)) {
-            foundStopWords.push(word);
-          }
+          if (lowerAll.includes(word)) foundStopWords.push(word);
         });
         if (foundStopWords.length > 0) {
           const penalty = Math.min(3.0, foundStopWords.length * 1.0);
@@ -1683,16 +1827,6 @@
             type: 'good',
             title: 'Все изображения имеют Alt-текст',
             rec: 'Почтовые клиенты корректно отобразят описание даже при отключенных картинках.'
-          });
-        }
-
-        // 6. Проверка соотношения текста и картинок
-        if (imageCount > 2 && totalChars < 120) {
-          score -= 2.0;
-          issues.push({
-            type: 'danger',
-            title: 'Слишком мало текста по отношению к изображениям (-2.0)',
-            rec: 'Спам-фильтры блокируют письма, состоящие почти целиком из картинок. Добавьте текстовые пояснения и описание предложения.'
           });
         }
 
@@ -1967,19 +2101,30 @@
             </tr>`;
 
           case 'zero_block': {
-            const h = s.height || 360;
+            const h = s.height || 420;
             let zeroElementsHtml = '';
             (block.data.elements || []).forEach(el => {
               if (el.type === 'text') {
                 zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; z-index:${el.zIndex || 1};">${el.content}</div>`;
               } else if (el.type === 'button') {
-                zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; z-index:${el.zIndex || 2};">
-                  <a href="${el.url}" target="_blank" style="display:block; text-align:center; background-color:${el.bgColor}; color:${el.textColor}; font-weight:700; font-size:${el.fontSize || 14}px; padding:12px; text-decoration:none;">${escapeHtml(el.text)}</a>
+                const borderStyle = el.strokeWidth ? `border:${el.strokeWidth}px ${el.strokeStyle || 'solid'} ${el.strokeColor || '#000'};` : '';
+                zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; z-index:${el.zIndex || 2};">
+                  <a href="${el.url || '#'}" target="_blank" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; box-sizing:border-box; background-color:${el.bgColor}; color:${el.textColor}; font-weight:700; font-size:${el.fontSize || 14}px; border-radius:${el.radius || 0}px; text-decoration:none; ${borderStyle}">${escapeHtml(el.text)}</a>
                 </div>`;
               } else if (el.type === 'image') {
                 zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; z-index:${el.zIndex || 1};">
-                  <img src="${el.url}" alt="${escapeHtml(el.alt || '')}" width="${el.width}" height="${el.height}" style="width:${el.width}px; height:${el.height}px; object-fit:cover; display:block;" />
+                  <img src="${el.url}" alt="${escapeHtml(el.alt || '')}" width="${el.width}" height="${el.height}" style="width:${el.width}px; height:${el.height}px; object-fit:cover; border-radius:${el.radius || 0}px; display:block;" />
                 </div>`;
+              } else if (el.type === 'rect') {
+                const borderStyle = el.strokeWidth ? `border:${el.strokeWidth}px ${el.strokeStyle || 'solid'} ${el.strokeColor || '#000'};` : '';
+                zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; background-color:${el.fill || '#f8fafc'}; border-radius:${el.radius || 0}px; opacity:${el.opacity !== undefined ? el.opacity : 1}; z-index:${el.zIndex || 1}; box-sizing:border-box; ${borderStyle}"></div>`;
+              } else if (el.type === 'circle') {
+                const borderStyle = el.strokeWidth ? `border:${el.strokeWidth}px solid ${el.strokeColor || '#000'};` : '';
+                zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; background-color:${el.fill || '#10b981'}; border-radius:50%; display:flex; align-items:center; justify-content:center; color:${el.textColor || '#fff'}; font-weight:bold; font-size:${Math.round(el.height*0.4)}px; z-index:${el.zIndex || 1}; box-sizing:border-box; ${borderStyle}">${escapeHtml(el.text || '')}</div>`;
+              } else if (el.type === 'line') {
+                zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height || 2}px; border-top:${el.strokeWidth || 2}px ${el.strokeStyle || 'solid'} ${el.strokeColor || '#cbd5e1'}; z-index:${el.zIndex || 1};"></div>`;
+              } else if (el.type === 'badge') {
+                zeroElementsHtml += `<div style="position:absolute; left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; background-color:${el.bgColor || '#1e50ff'}; color:${el.textColor || '#ffffff'}; border-radius:${el.radius || 4}px; font-size:${el.fontSize || 11}px; font-weight:800; display:flex; align-items:center; justify-content:center; z-index:${el.zIndex || 2};">${escapeHtml(el.text)}</div>`;
               }
             });
 
@@ -2013,13 +2158,12 @@
         let html = '';
 
         BuilderState.blocks.forEach((block, index) => {
-          // Разделитель перед блоком
+          // Разделитель перед каждым блоком
           html += `
           <div class="add-block-separator" data-index="${index}" title="Вставить блок сюда">
             <div class="add-block-plus-btn">+</div>
           </div>`;
 
-          // Тело блока
           const isSelected = BuilderState.selectedBlockId === block.id;
           const isHidden = block.hidden;
 
@@ -2174,33 +2318,74 @@
           case 'zero_block': {
             const elsHtml = (block.data.elements || []).map(el => {
               const isElActive = BuilderState.selectedZeroElementId === el.id;
+              let innerContent = '';
+
               if (el.type === 'text') {
-                return `<div class="zero-element ${isElActive ? 'active' : ''}" data-el-id="${el.id}" style="left:${el.x}px; top:${el.y}px; width:${el.width}px; z-index:${el.zIndex || 1};">
-                  <div contenteditable="true" style="outline:none;">${el.content}</div>
-                  <div class="zero-resize-handle"></div>
-                </div>`;
+                innerContent = `<div contenteditable="true" class="zero-text-editor" style="outline:none; width:100%; height:100%;">${el.content}</div>`;
               } else if (el.type === 'button') {
-                return `<div class="zero-element ${isElActive ? 'active' : ''}" data-el-id="${el.id}" style="left:${el.x}px; top:${el.y}px; width:${el.width}px; z-index:${el.zIndex || 2};">
-                  <div style="background:${el.bgColor}; color:${el.textColor}; text-align:center; font-weight:700; padding:12px; font-size:${el.fontSize || 14}px;">${el.text}</div>
-                  <div class="zero-resize-handle"></div>
-                </div>`;
+                const borderStyle = el.strokeWidth ? `border:${el.strokeWidth}px ${el.strokeStyle || 'solid'} ${el.strokeColor || '#000'};` : '';
+                innerContent = `<div style="background:${el.bgColor}; color:${el.textColor}; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:${el.fontSize || 14}px; border-radius:${el.radius || 0}px; box-sizing:border-box; ${borderStyle}">${escapeHtml(el.text)}</div>`;
               } else if (el.type === 'image') {
-                return `<div class="zero-element ${isElActive ? 'active' : ''}" data-el-id="${el.id}" style="left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; z-index:${el.zIndex || 1};">
-                  <img src="${el.url}" alt="${escapeHtml(el.alt || '')}" style="width:100%; height:100%; object-fit:cover; pointer-events:none;" />
-                  <div class="zero-resize-handle"></div>
-                </div>`;
+                innerContent = `<img src="${el.url}" alt="${escapeHtml(el.alt || '')}" style="width:100%; height:100%; object-fit:cover; border-radius:${el.radius || 0}px; pointer-events:none; display:block;" />`;
+              } else if (el.type === 'rect') {
+                const borderStyle = el.strokeWidth ? `border:${el.strokeWidth}px ${el.strokeStyle || 'solid'} ${el.strokeColor || '#000'};` : '';
+                innerContent = `<div style="width:100%; height:100%; background:${el.fill || '#f8fafc'}; border-radius:${el.radius || 0}px; opacity:${el.opacity !== undefined ? el.opacity : 1}; box-sizing:border-box; ${borderStyle}"></div>`;
+              } else if (el.type === 'circle') {
+                const borderStyle = el.strokeWidth ? `border:${el.strokeWidth}px solid ${el.strokeColor || '#000'};` : '';
+                innerContent = `<div style="width:100%; height:100%; background:${el.fill || '#10b981'}; border-radius:50%; display:flex; align-items:center; justify-content:center; color:${el.textColor || '#fff'}; font-weight:bold; font-size:${Math.round(el.height*0.4)}px; box-sizing:border-box; ${borderStyle}">${escapeHtml(el.text || '')}</div>`;
+              } else if (el.type === 'line') {
+                innerContent = `<div style="width:100%; height:100%; border-top:${el.strokeWidth || 2}px ${el.strokeStyle || 'solid'} ${el.strokeColor || '#cbd5e1'};"></div>`;
+              } else if (el.type === 'icon') {
+                const svgContent = ZERO_ICONS[el.iconName || 'star'] || ZERO_ICONS.star;
+                innerContent = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:${el.color || '#1e50ff'};">${svgContent}</div>`;
+              } else if (el.type === 'badge') {
+                innerContent = `<div style="width:100%; height:100%; background:${el.bgColor || '#1e50ff'}; color:${el.textColor || '#ffffff'}; border-radius:${el.radius || 4}px; font-size:${el.fontSize || 11}px; font-weight:800; display:flex; align-items:center; justify-content:center; text-transform:uppercase; letter-spacing:0.5px;">${escapeHtml(el.text)}</div>`;
               }
-              return '';
+
+              return `
+              <div class="zero-element ${isElActive ? 'active' : ''}" 
+                   data-el-id="${el.id}" 
+                   style="left:${el.x}px; top:${el.y}px; width:${el.width}px; height:${el.height}px; z-index:${el.zIndex || 1};">
+                ${innerContent}
+                
+                <!-- Бейдж координат -->
+                <div class="zero-coords-badge">X:${Math.round(el.x)} Y:${Math.round(el.y)} | ${Math.round(el.width)}×${Math.round(el.height)}</div>
+
+                <!-- 8 маркеров изменения размера (Figma Handles) -->
+                <div class="handle-nw" data-handle="nw"></div>
+                <div class="handle-tc" data-handle="tc"></div>
+                <div class="handle-tr" data-handle="tr"></div>
+                <div class="handle-mr" data-handle="mr"></div>
+                <div class="handle-br" data-handle="br"></div>
+                <div class="handle-bc" data-handle="bc"></div>
+                <div class="handle-bl" data-handle="bl"></div>
+                <div class="handle-ml" data-handle="ml"></div>
+              </div>`;
             }).join('');
 
             return `
-            <div class="zero-block-canvas grid-bg" style="height:${s.height || 360}px;">
+            <div class="zero-block-canvas ${s.showGrid !== false ? 'grid-bg' : ''}" style="height:${s.height || 420}px;">
+              <!-- Верхний Figma-тулбар Zero Block -->
               <div class="zero-block-topbar">
-                <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase;">Zero Block</span>
-                <button class="btn" style="padding:3px 8px; font-size:0.7rem;" data-zero-add="text">+ Текст</button>
-                <button class="btn" style="padding:3px 8px; font-size:0.7rem;" data-zero-add="button">+ Кнопка</button>
-                <button class="btn" style="padding:3px 8px; font-size:0.7rem;" data-zero-add="image">+ Картинка</button>
+                <div class="zero-tool-group">
+                  <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; margin-right:4px;">⚡ Zero Figma</span>
+                  <button class="zero-tool-btn" data-zero-add="text" title="Текстовый слой (T)"><b>T</b> Текст</button>
+                  <button class="zero-tool-btn" data-zero-add="button" title="Интерактивная кнопка">🔘 Кнопка</button>
+                  <button class="zero-tool-btn" data-zero-add="rect" title="Прямоугольник / Контейнер (R)">▢ Бокс</button>
+                  <button class="zero-tool-btn" data-zero-add="circle" title="Круг / Бейдж (O)">○ Круг</button>
+                  <button class="zero-tool-btn" data-zero-add="line" title="Разделитель / Линия (L)">— Линия</button>
+                  <button class="zero-tool-btn" data-zero-add="image" title="Изображение">🖼 Фото</button>
+                  <button class="zero-tool-btn" data-zero-add="icon" title="Векторная иконка">★ Иконка</button>
+                  <button class="zero-tool-btn" data-zero-add="badge" title="Стикер / Тег">🏷 Тег</button>
+                </div>
+                <div class="zero-tool-group">
+                  <button class="zero-tool-btn" id="btnToggleZeroGrid" title="Вкл/Выкл сетку"># Сетка</button>
+                  <button class="zero-tool-btn" id="btnZeroBringFront" title="Слой наверх">↑ Вверх</button>
+                  <button class="zero-tool-btn" id="btnZeroSendBack" title="Слой вниз">↓ Вниз</button>
+                  <button class="zero-tool-btn" id="btnZeroDeleteEl" style="color:var(--accent-red);" title="Удалить слой (Del)">🗑</button>
+                </div>
               </div>
+
               ${elsHtml}
             </div>`;
           }
@@ -2215,9 +2400,16 @@
         blocks.forEach(el => {
           const id = el.getAttribute('data-id');
 
-          // Клик для выбора блока
+          // Клик по блоку: НЕ сбрасывает фокус и НЕ перерисовывает холст если блок уже выбран!
           el.addEventListener('click', (e) => {
             if (e.target.closest('.block-action-toolbar')) return;
+            if (e.target.closest('[contenteditable="true"]')) {
+              // Если клик по тексту, только активируем блок в панели, не сбивая курсор
+              if (BuilderState.selectedBlockId !== id) {
+                switchActiveBlockClass(id);
+              }
+              return;
+            }
             selectBlock(id);
           });
 
@@ -2313,48 +2505,81 @@
           });
         });
 
-        // Zero block dragging & resizing
+        // Инициализация Figma-взаимодействий в Zero Block
         this.attachZeroBlockInteractions();
       },
 
       attachZeroBlockInteractions() {
+        const currentBlock = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
+        if (!currentBlock || currentBlock.type !== 'zero_block') return;
+
         const zeroElements = document.querySelectorAll('.zero-element');
         zeroElements.forEach(el => {
           const elId = el.getAttribute('data-el-id');
 
+          // Клик и драг элемента
           el.addEventListener('mousedown', (e) => {
-            if (e.target.closest('[contenteditable="true"]')) return;
-            e.stopPropagation();
-            BuilderState.selectedZeroElementId = elId;
-            CanvasRenderer.render();
+            if (e.target.closest('[contenteditable="true"]:focus')) return;
 
-            let startX = e.clientX;
-            let startY = e.clientY;
-            const currentBlock = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
-            if (!currentBlock || currentBlock.type !== 'zero_block') return;
+            e.stopPropagation();
+            selectZeroElement(elId);
+
             const item = currentBlock.data.elements.find(x => x.id === elId);
             if (!item) return;
 
-            const isResize = e.target.classList.contains('zero-resize-handle');
+            const handle = e.target.getAttribute('data-handle');
+            const isResize = !!handle;
+
+            let startX = e.clientX;
+            let startY = e.clientY;
+            const initX = item.x;
+            const initY = item.y;
+            const initW = item.width;
+            const initH = item.height;
 
             const onMouseMove = (moveEv) => {
               const dx = moveEv.clientX - startX;
               const dy = moveEv.clientY - startY;
+
               if (isResize) {
-                item.width = Math.max(40, item.width + dx);
-                if (item.height) item.height = Math.max(30, item.height + dy);
+                // 8-направленный Figma ресайз
+                if (handle.includes('e')) item.width = Math.max(30, initW + dx);
+                if (handle.includes('s')) item.height = Math.max(20, initH + dy);
+                if (handle.includes('w')) {
+                  const newW = Math.max(30, initW - dx);
+                  item.x = initX + (initW - newW);
+                  item.width = newW;
+                }
+                if (handle.includes('n')) {
+                  const newH = Math.max(20, initH - dy);
+                  item.y = initY + (initH - newH);
+                  item.height = newH;
+                }
               } else {
-                item.x = Math.max(0, item.x + dx);
-                item.y = Math.max(0, item.y + dy);
+                // Свободное перемещение (Figma Move)
+                item.x = Math.max(0, initX + dx);
+                item.y = Math.max(0, initY + dy);
               }
-              startX = moveEv.clientX;
-              startY = moveEv.clientY;
-              CanvasRenderer.render();
+
+              // Быстрое обновление стилей DOM без полной перерисовки
+              el.style.left = item.x + 'px';
+              el.style.top = item.y + 'px';
+              el.style.width = item.width + 'px';
+              el.style.height = item.height + 'px';
+              
+              const badge = el.querySelector('.zero-coords-badge');
+              if (badge) {
+                badge.textContent = `X:${Math.round(item.x)} Y:${Math.round(item.y)} | ${Math.round(item.width)}×${Math.round(item.height)}`;
+              }
+
+              Inspector.syncZeroGeoInputs(item);
             };
 
             const onMouseUp = () => {
               window.removeEventListener('mousemove', onMouseMove);
               window.removeEventListener('mouseup', onMouseUp);
+              CanvasRenderer.render();
+              Inspector.render();
               triggerAutoSave();
             };
 
@@ -2363,7 +2588,19 @@
           });
         });
 
-        // Кнопки добавления элементов внутри Zero Block
+        // Редактирование текста внутри Zero Block
+        document.querySelectorAll('.zero-text-editor').forEach(tedit => {
+          tedit.addEventListener('input', () => {
+            const elId = tedit.closest('.zero-element').getAttribute('data-el-id');
+            const item = currentBlock.data.elements.find(x => x.id === elId);
+            if (item) {
+              item.content = tedit.innerHTML;
+              triggerAutoSave();
+            }
+          });
+        });
+
+        // Кнопки добавления элементов в Zero Block
         document.querySelectorAll('[data-zero-add]').forEach(btn => {
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -2371,8 +2608,56 @@
             addZeroElement(type);
           });
         });
+
+        // Переключатель сетки
+        const gridBtn = document.getElementById('btnToggleZeroGrid');
+        if (gridBtn) {
+          gridBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentBlock.settings.showGrid = !currentBlock.settings.showGrid;
+            CanvasRenderer.render();
+            triggerAutoSave();
+          });
+        }
+
+        // Поднять слой наверх
+        const bringFrontBtn = document.getElementById('btnZeroBringFront');
+        if (bringFrontBtn) {
+          bringFrontBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            changeZeroElementZIndex(1);
+          });
+        }
+
+        // Опустить слой вниз
+        const sendBackBtn = document.getElementById('btnZeroSendBack');
+        if (sendBackBtn) {
+          sendBackBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            changeZeroElementZIndex(-1);
+          });
+        }
+
+        // Удалить элемент
+        const deleteElBtn = document.getElementById('btnZeroDeleteEl');
+        if (deleteElBtn) {
+          deleteElBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteSelectedZeroElement();
+          });
+        }
       }
     };
+
+    // ================= ПЕРЕКЛЮЧЕНИЕ КЛАССА ВЫБРАННОГО БЛОКА БЕЗ ПЕРЕРИСОВКИ =================
+    function switchActiveBlockClass(id) {
+      BuilderState.selectedBlockId = id;
+      document.querySelectorAll('.builder-block').forEach(b => {
+        if (b.getAttribute('data-id') === id) b.classList.add('selected');
+        else b.classList.remove('selected');
+      });
+      Inspector.render();
+    }
 
     // ================= ИНСПЕКТОР СВОЙСТВ (ПРАВАЯ ПАНЕЛЬ) =================
     const Inspector = {
@@ -2388,7 +2673,7 @@
               <div style="text-align:center; padding:40px 10px; color:var(--text-muted);">
                 <div style="font-size:1.8rem; margin-bottom:8px;">🎯</div>
                 <div style="font-weight:700; font-size:0.85rem; margin-bottom:4px;">Блок не выбран</div>
-                <div style="font-size:0.75rem;">Кликните по любому блоку на холсте, чтобы настроить его параметры</div>
+                <div style="font-size:0.75rem;">Кликните по любому блоку на холсте для настройки</div>
               </div>`;
             return;
           }
@@ -2453,6 +2738,13 @@
 
       renderBlockSettings(b) {
         const s = b.settings;
+
+        // Если это Zero Block и выбран конкретный элемент — отрисовываем FIGMA DESIGN PANEL
+        if (b.type === 'zero_block' && BuilderState.selectedZeroElementId) {
+          const el = (b.data.elements || []).find(x => x.id === BuilderState.selectedZeroElementId);
+          if (el) return this.renderZeroElementFigmaInspector(b, el);
+        }
+
         let specificHtml = '';
 
         if (b.type === 'header') {
@@ -2468,20 +2760,20 @@
               <input type="number" id="headerLogoWidth" class="prop-input prop-input-number" min="50" max="300" value="${b.data.logoWidth || 140}">
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-              <span class="prop-label">Alt-текст (для спам-фильтра):</span>
+              <span class="prop-label">Alt-текст:</span>
               <input type="text" id="headerLogoAlt" class="prop-input" value="${b.data.logoAlt || ''}">
             </div>
           </div>`;
         } else if (b.type === 'image') {
           specificHtml = `
           <div class="prop-section">
-            <div class="prop-section-title">Изображение (только публичный URL)</div>
+            <div class="prop-section-title">Изображение (публичный URL)</div>
             <div style="display:flex; flex-direction:column; gap:6px;">
               <span class="prop-label">URL изображения:</span>
               <input type="text" id="imgUrlInput" class="prop-input" value="${b.data.url}">
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-              <span class="prop-label">Alt-текст (обязательно для спам-рейтинга):</span>
+              <span class="prop-label">Alt-текст (обязательно):</span>
               <input type="text" id="imgAltInput" class="prop-input" value="${b.data.alt || ''}">
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
@@ -2527,22 +2819,17 @@
               <span class="prop-label">Скругление углов:</span>
               <input type="number" id="btnBorderRadiusInput" class="prop-input prop-input-number" min="0" max="40" value="${b.data.borderRadius || 0}">
             </div>
-            <div class="prop-row">
-              <span class="prop-label">Выравнивание:</span>
-              <select id="btnAlignSelect" class="prop-select">
-                <option value="left" ${s.align === 'left' ? 'selected' : ''}>Слева</option>
-                <option value="center" ${s.align === 'center' ? 'selected' : ''}>По центру</option>
-                <option value="right" ${s.align === 'right' ? 'selected' : ''}>Справа</option>
-              </select>
-            </div>
           </div>`;
         } else if (b.type === 'zero_block') {
           specificHtml = `
           <div class="prop-section">
-            <div class="prop-section-title">Параметры Zero Block</div>
+            <div class="prop-section-title">Холст Zero Block</div>
             <div class="prop-row">
               <span class="prop-label">Высота холста (px):</span>
-              <input type="number" id="zeroHeightInput" class="prop-input prop-input-number" min="200" max="800" step="20" value="${s.height || 360}">
+              <input type="number" id="zeroHeightInput" class="prop-input prop-input-number" min="200" max="1000" step="20" value="${s.height || 420}">
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:6px;">
+              💡 Выберите любой элемент на холсте Zero Block, чтобы редактировать его слои, цвета, границы и эффекты в стиле Figma.
             </div>
           </div>`;
         }
@@ -2588,6 +2875,166 @@
         ${specificHtml}`;
       },
 
+      // Figma-стиль инспектора слоя Zero Block
+      renderZeroElementFigmaInspector(block, el) {
+        return `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <div style="font-weight:800; font-size:0.85rem; text-transform:uppercase;">
+            Слой: ${el.type.toUpperCase()}
+          </div>
+          <button class="btn" id="btnDeselectZeroEl" style="padding:2px 6px; font-size:0.7rem;">Снять выбор</button>
+        </div>
+
+        <!-- 1. Геометрия (X, Y, W, H) -->
+        <div class="prop-section">
+          <div class="prop-section-title">Геометрия (Position & Size)</div>
+          <div class="figma-geo-grid">
+            <div class="figma-geo-box"><span>X</span><input type="number" id="zPropX" value="${Math.round(el.x)}"></div>
+            <div class="figma-geo-box"><span>Y</span><input type="number" id="zPropY" value="${Math.round(el.y)}"></div>
+            <div class="figma-geo-box"><span>W</span><input type="number" id="zPropW" value="${Math.round(el.width)}"></div>
+            <div class="figma-geo-box"><span>H</span><input type="number" id="zPropH" value="${Math.round(el.height || 40)}"></div>
+          </div>
+          ${el.radius !== undefined ? `
+          <div class="prop-row" style="margin-top:6px;">
+            <span class="prop-label">Скругление (Radius px):</span>
+            <input type="number" id="zPropRadius" class="prop-input prop-input-number" min="0" max="100" value="${el.radius || 0}">
+          </div>` : ''}
+          <div class="prop-row">
+            <span class="prop-label">Порядок слоя (Z-Index):</span>
+            <input type="number" id="zPropZIndex" class="prop-input prop-input-number" min="1" max="99" value="${el.zIndex || 1}">
+          </div>
+        </div>
+
+        <!-- 2. Заливка (Fill) -->
+        ${(el.fill !== undefined || el.bgColor !== undefined) ? `
+        <div class="prop-section">
+          <div class="prop-section-title">Заливка (Fill)</div>
+          <div class="prop-row">
+            <span class="prop-label">Цвет фона:</span>
+            <div class="prop-color-picker">
+              <input type="color" id="zPropFill" class="prop-color-input" value="${el.fill || el.bgColor || '#1e50ff'}">
+              <span class="prop-color-val">${el.fill || el.bgColor || '#1e50ff'}</span>
+            </div>
+          </div>
+        </div>` : ''}
+
+        <!-- 3. Обводка (Stroke / Border) -->
+        ${el.strokeWidth !== undefined ? `
+        <div class="prop-section">
+          <div class="prop-section-title">Обводка (Stroke)</div>
+          <div class="prop-row">
+            <span class="prop-label">Цвет обводки:</span>
+            <div class="prop-color-picker">
+              <input type="color" id="zPropStrokeColor" class="prop-color-input" value="${el.strokeColor || '#cbd5e1'}">
+              <span class="prop-color-val">${el.strokeColor || '#cbd5e1'}</span>
+            </div>
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Толщина (px):</span>
+            <input type="number" id="zPropStrokeWidth" class="prop-input prop-input-number" min="0" max="20" value="${el.strokeWidth || 0}">
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Стиль линии:</span>
+            <select id="zPropStrokeStyle" class="prop-select">
+              <option value="solid" ${el.strokeStyle === 'solid' ? 'selected' : ''}>Solid (сплошная)</option>
+              <option value="dashed" ${el.strokeStyle === 'dashed' ? 'selected' : ''}>Dashed (пунктир)</option>
+              <option value="dotted" ${el.strokeStyle === 'dotted' ? 'selected' : ''}>Dotted (точки)</option>
+            </select>
+          </div>
+        </div>` : ''}
+
+        <!-- 4. Специфические поля для Текста / Кнопки / Картинки / Иконки -->
+        ${el.type === 'text' ? `
+        <div class="prop-section">
+          <div class="prop-section-title">Текст слоя</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">
+            💡 Кликните прямо по тексту на холсте, чтобы моментально редактировать его.
+          </div>
+        </div>` : ''}
+
+        ${(el.type === 'button' || el.type === 'badge') ? `
+        <div class="prop-section">
+          <div class="prop-section-title">Текст и ссылка</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span class="prop-label">Надпись:</span>
+            <input type="text" id="zPropText" class="prop-input" value="${el.text || ''}">
+          </div>
+          ${el.url !== undefined ? `
+          <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+            <span class="prop-label">Ссылка URL:</span>
+            <input type="text" id="zPropUrl" class="prop-input" value="${el.url || ''}">
+          </div>` : ''}
+          <div class="prop-row" style="margin-top:8px;">
+            <span class="prop-label">Цвет текста:</span>
+            <div class="prop-color-picker">
+              <input type="color" id="zPropTextColor" class="prop-color-input" value="${el.textColor || '#ffffff'}">
+              <span class="prop-color-val">${el.textColor || '#ffffff'}</span>
+            </div>
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Размер шрифта:</span>
+            <input type="number" id="zPropFontSize" class="prop-input prop-input-number" min="10" max="48" value="${el.fontSize || 14}">
+          </div>
+        </div>` : ''}
+
+        ${el.type === 'image' ? `
+        <div class="prop-section">
+          <div class="prop-section-title">Параметры изображения</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span class="prop-label">URL изображения:</span>
+            <input type="text" id="zPropImgUrl" class="prop-input" value="${el.url || ''}">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+            <span class="prop-label">Alt-текст:</span>
+            <input type="text" id="zPropImgAlt" class="prop-input" value="${el.alt || ''}">
+          </div>
+        </div>` : ''}
+
+        ${el.type === 'icon' ? `
+        <div class="prop-section">
+          <div class="prop-section-title">Параметры иконки</div>
+          <div class="prop-row">
+            <span class="prop-label">Выбор иконки:</span>
+            <select id="zPropIconName" class="prop-select">
+              <option value="star" ${el.iconName === 'star' ? 'selected' : ''}>★ Звезда</option>
+              <option value="check" ${el.iconName === 'check' ? 'selected' : ''}>✓ Галочка</option>
+              <option value="heart" ${el.iconName === 'heart' ? 'selected' : ''}>❤️ Сердце</option>
+              <option value="fire" ${el.iconName === 'fire' ? 'selected' : ''}>🔥 Огонь</option>
+              <option value="flash" ${el.iconName === 'flash' ? 'selected' : ''}>⚡ Молния</option>
+              <option value="gift" ${el.iconName === 'gift' ? 'selected' : ''}>🎁 Подарок</option>
+              <option value="shield" ${el.iconName === 'shield' ? 'selected' : ''}>🛡️ Защита</option>
+              <option value="mail" ${el.iconName === 'mail' ? 'selected' : ''}>✉️ Почта</option>
+              <option value="phone" ${el.iconName === 'phone' ? 'selected' : ''}>📞 Телефон</option>
+              <option value="bag" ${el.iconName === 'bag' ? 'selected' : ''}>🛍️ Покупка</option>
+              <option value="arrow" ${el.iconName === 'arrow' ? 'selected' : ''}>→ Стрелка</option>
+            </select>
+          </div>
+          <div class="prop-row">
+            <span class="prop-label">Цвет иконки:</span>
+            <div class="prop-color-picker">
+              <input type="color" id="zPropIconColor" class="prop-color-input" value="${el.color || '#1e50ff'}">
+              <span class="prop-color-val">${el.color || '#1e50ff'}</span>
+            </div>
+          </div>
+        </div>` : ''}
+
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="btn btn-dark" id="btnDuplicateZeroEl" style="flex:1; justify-content:center;">⧉ Дублировать</button>
+          <button class="btn" id="btnDeleteZeroElDirect" style="color:var(--accent-red); justify-content:center;">Удалить</button>
+        </div>`;
+      },
+
+      syncZeroGeoInputs(el) {
+        const x = document.getElementById('zPropX');
+        const y = document.getElementById('zPropY');
+        const w = document.getElementById('zPropW');
+        const h = document.getElementById('zPropH');
+        if (x) x.value = Math.round(el.x);
+        if (y) y.value = Math.round(el.y);
+        if (w) w.value = Math.round(el.width);
+        if (h) h.value = Math.round(el.height);
+      },
+
       attachEmailSettingsEvents() {
         const slider = document.getElementById('emailWidthSlider');
         const valSpan = document.getElementById('emailWidthVal');
@@ -2629,114 +3076,151 @@
       },
 
       attachBlockSettingsEvents(b) {
-        document.getElementById('blockBgColor').addEventListener('input', (e) => {
-          b.settings.bg = e.target.value;
-          CanvasRenderer.render();
-          triggerAutoSave();
-        });
+        // Если это Zero Block и выбран слой
+        if (b.type === 'zero_block' && BuilderState.selectedZeroElementId) {
+          const el = (b.data.elements || []).find(x => x.id === BuilderState.selectedZeroElementId);
+          if (el) {
+            const deselectBtn = document.getElementById('btnDeselectZeroEl');
+            if (deselectBtn) {
+              deselectBtn.addEventListener('click', () => {
+                BuilderState.selectedZeroElementId = null;
+                CanvasRenderer.render();
+                Inspector.render();
+              });
+            }
+
+            // Геометрия
+            const setVal = (id, prop) => {
+              const input = document.getElementById(id);
+              if (input) {
+                input.addEventListener('input', () => {
+                  el[prop] = parseInt(input.value, 10) || 0;
+                  CanvasRenderer.render();
+                  triggerAutoSave();
+                });
+              }
+            };
+            setVal('zPropX', 'x');
+            setVal('zPropY', 'y');
+            setVal('zPropW', 'width');
+            setVal('zPropH', 'height');
+            setVal('zPropRadius', 'radius');
+            setVal('zPropZIndex', 'zIndex');
+
+            // Заливка
+            const fillInput = document.getElementById('zPropFill');
+            if (fillInput) {
+              fillInput.addEventListener('input', (e) => {
+                if (el.fill !== undefined) el.fill = e.target.value;
+                if (el.bgColor !== undefined) el.bgColor = e.target.value;
+                CanvasRenderer.render();
+                triggerAutoSave();
+              });
+            }
+
+            // Обводка
+            const strokeColor = document.getElementById('zPropStrokeColor');
+            if (strokeColor) strokeColor.addEventListener('input', (e) => { el.strokeColor = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+            const strokeWidth = document.getElementById('zPropStrokeWidth');
+            if (strokeWidth) strokeWidth.addEventListener('input', (e) => { el.strokeWidth = parseInt(e.target.value, 10); CanvasRenderer.render(); triggerAutoSave(); });
+            const strokeStyle = document.getElementById('zPropStrokeStyle');
+            if (strokeStyle) strokeStyle.addEventListener('change', (e) => { el.strokeStyle = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+
+            // Текст и кнопка
+            const textInput = document.getElementById('zPropText');
+            if (textInput) textInput.addEventListener('input', (e) => { el.text = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+            const urlInput = document.getElementById('zPropUrl');
+            if (urlInput) urlInput.addEventListener('input', (e) => { el.url = e.target.value; triggerAutoSave(); });
+            const textColorInput = document.getElementById('zPropTextColor');
+            if (textColorInput) textColorInput.addEventListener('input', (e) => { el.textColor = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+            const fontSizeInput = document.getElementById('zPropFontSize');
+            if (fontSizeInput) fontSizeInput.addEventListener('input', (e) => { el.fontSize = parseInt(e.target.value, 10); CanvasRenderer.render(); triggerAutoSave(); });
+
+            // Картинка
+            const imgUrl = document.getElementById('zPropImgUrl');
+            if (imgUrl) imgUrl.addEventListener('input', (e) => { el.url = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+            const imgAlt = document.getElementById('zPropImgAlt');
+            if (imgAlt) imgAlt.addEventListener('input', (e) => { el.alt = e.target.value; triggerAutoSave(); updateSpamScoreIndicator(); });
+
+            // Иконка
+            const iconName = document.getElementById('zPropIconName');
+            if (iconName) iconName.addEventListener('change', (e) => { el.iconName = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+            const iconColor = document.getElementById('zPropIconColor');
+            if (iconColor) iconColor.addEventListener('input', (e) => { el.color = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+
+            // Дублировать / Удалить
+            const dupBtn = document.getElementById('btnDuplicateZeroEl');
+            if (dupBtn) dupBtn.addEventListener('click', () => duplicateZeroElement(el.id));
+            const delBtn = document.getElementById('btnDeleteZeroElDirect');
+            if (delBtn) delBtn.addEventListener('click', () => deleteSelectedZeroElement());
+
+            return;
+          }
+        }
+
+        // Общие настройки обычного блока
+        const blockBg = document.getElementById('blockBgColor');
+        if (blockBg) {
+          blockBg.addEventListener('input', (e) => {
+            b.settings.bg = e.target.value;
+            CanvasRenderer.render();
+            triggerAutoSave();
+          });
+        }
 
         ['padTop', 'padBottom', 'padLeft', 'padRight'].forEach(id => {
-          document.getElementById(id).addEventListener('input', () => {
-            b.settings.paddingTop = parseInt(document.getElementById('padTop').value, 10) || 0;
-            b.settings.paddingBottom = parseInt(document.getElementById('padBottom').value, 10) || 0;
-            b.settings.paddingLeft = parseInt(document.getElementById('padLeft').value, 10) || 0;
-            b.settings.paddingRight = parseInt(document.getElementById('padRight').value, 10) || 0;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
+          const elInput = document.getElementById(id);
+          if (elInput) {
+            elInput.addEventListener('input', () => {
+              b.settings.paddingTop = parseInt(document.getElementById('padTop').value, 10) || 0;
+              b.settings.paddingBottom = parseInt(document.getElementById('padBottom').value, 10) || 0;
+              b.settings.paddingLeft = parseInt(document.getElementById('padLeft').value, 10) || 0;
+              b.settings.paddingRight = parseInt(document.getElementById('padRight').value, 10) || 0;
+              CanvasRenderer.render();
+              triggerAutoSave();
+            });
+          }
         });
 
-        // Специфические слушатели
+        // Специфические слушатели для стандартных блоков
         if (b.type === 'header') {
-          document.getElementById('headerLogoUrl').addEventListener('input', (e) => {
-            b.data.logoUrl = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('headerLogoWidth').addEventListener('input', (e) => {
-            b.data.logoWidth = parseInt(e.target.value, 10);
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('headerLogoAlt').addEventListener('input', (e) => {
-            b.data.logoAlt = e.target.value;
-            triggerAutoSave();
-            updateSpamScoreIndicator();
-          });
+          document.getElementById('headerLogoUrl').addEventListener('input', (e) => { b.data.logoUrl = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+          document.getElementById('headerLogoWidth').addEventListener('input', (e) => { b.data.logoWidth = parseInt(e.target.value, 10); CanvasRenderer.render(); triggerAutoSave(); });
+          document.getElementById('headerLogoAlt').addEventListener('input', (e) => { b.data.logoAlt = e.target.value; triggerAutoSave(); updateSpamScoreIndicator(); });
         } else if (b.type === 'image') {
-          document.getElementById('imgUrlInput').addEventListener('input', (e) => {
-            b.data.url = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('imgAltInput').addEventListener('input', (e) => {
-            b.data.alt = e.target.value;
-            triggerAutoSave();
-            updateSpamScoreIndicator();
-          });
-          document.getElementById('imgLinkInput').addEventListener('input', (e) => {
-            b.data.link = e.target.value;
-            triggerAutoSave();
-          });
-          document.getElementById('imgAlignSelect').addEventListener('change', (e) => {
-            b.settings.align = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
+          document.getElementById('imgUrlInput').addEventListener('input', (e) => { b.data.url = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+          document.getElementById('imgAltInput').addEventListener('input', (e) => { b.data.alt = e.target.value; triggerAutoSave(); updateSpamScoreIndicator(); });
+          document.getElementById('imgLinkInput').addEventListener('input', (e) => { b.data.link = e.target.value; triggerAutoSave(); });
+          document.getElementById('imgAlignSelect').addEventListener('change', (e) => { b.settings.align = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
         } else if (b.type === 'button') {
-          document.getElementById('btnTextInput').addEventListener('input', (e) => {
-            b.data.text = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('btnUrlInput').addEventListener('input', (e) => {
-            b.data.url = e.target.value;
-            triggerAutoSave();
-          });
-          document.getElementById('btnBgColorInput').addEventListener('input', (e) => {
-            b.data.bgColor = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('btnTextColorInput').addEventListener('input', (e) => {
-            b.data.textColor = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('btnBorderRadiusInput').addEventListener('input', (e) => {
-            b.data.borderRadius = parseInt(e.target.value, 10);
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
-          document.getElementById('btnAlignSelect').addEventListener('change', (e) => {
-            b.settings.align = e.target.value;
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
+          document.getElementById('btnTextInput').addEventListener('input', (e) => { b.data.text = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+          document.getElementById('btnUrlInput').addEventListener('input', (e) => { b.data.url = e.target.value; triggerAutoSave(); });
+          document.getElementById('btnBgColorInput').addEventListener('input', (e) => { b.data.bgColor = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+          document.getElementById('btnTextColorInput').addEventListener('input', (e) => { b.data.textColor = e.target.value; CanvasRenderer.render(); triggerAutoSave(); });
+          document.getElementById('btnBorderRadiusInput').addEventListener('input', (e) => { b.data.borderRadius = parseInt(e.target.value, 10); CanvasRenderer.render(); triggerAutoSave(); });
         } else if (b.type === 'zero_block') {
-          document.getElementById('zeroHeightInput').addEventListener('input', (e) => {
-            b.settings.height = parseInt(e.target.value, 10);
-            CanvasRenderer.render();
-            triggerAutoSave();
-          });
+          const zh = document.getElementById('zeroHeightInput');
+          if (zh) zh.addEventListener('input', (e) => { b.settings.height = parseInt(e.target.value, 10); CanvasRenderer.render(); triggerAutoSave(); });
         }
       }
     };
 
     // ================= ДЕЙСТВИЯ НАД БЛОКАМИ =================
     function selectBlock(id) {
+      if (BuilderState.selectedBlockId === id) return;
       BuilderState.selectedBlockId = id;
+      BuilderState.selectedZeroElementId = null;
       BuilderState.activeTab = 'block';
       document.getElementById('tabBlockBtn').classList.add('active');
       document.getElementById('tabEmailBtn').classList.remove('active');
-      CanvasRenderer.render();
-      Inspector.render();
+      switchActiveBlockClass(id);
     }
 
     function insertBlockAt(type, index) {
       const block = BlockFactory.create(type);
       if (!block) return;
       BuilderState.blocks.splice(index, 0, block);
+      CanvasRenderer.render();
       selectBlock(block.id);
       showToast(`Блок «${type}» успешно добавлен`);
       triggerAutoSave();
@@ -2761,6 +3245,7 @@
       const clone = JSON.parse(JSON.stringify(original));
       clone.id = 'blk_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
       BuilderState.blocks.splice(index + 1, 0, clone);
+      CanvasRenderer.render();
       selectBlock(clone.id);
       showToast('Блок продублирован');
       triggerAutoSave();
@@ -2787,53 +3272,196 @@
       triggerAutoSave();
     }
 
+    // ================= ZERO BLOCK ЭЛЕМЕНТЫ (FIGMA TOOLS) =================
+    function selectZeroElement(elId) {
+      BuilderState.selectedZeroElementId = elId;
+      document.querySelectorAll('.zero-element').forEach(el => {
+        if (el.getAttribute('data-el-id') === elId) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+      Inspector.render();
+    }
+
     function addZeroElement(type) {
       const block = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
       if (!block || block.type !== 'zero_block') return;
 
       const id = 'ze_' + Math.random().toString(36).substr(2, 6);
+      const newEl = { id, type, x: 40, y: 60, zIndex: (block.data.elements.length || 0) + 1 };
+
       if (type === 'text') {
-        block.data.elements.push({
-          id,
-          type: 'text',
-          x: 40,
-          y: 40,
-          width: 240,
-          content: '<div style="font-size:16px; font-weight:700;">Новый текст</div>',
-          zIndex: 2
+        Object.assign(newEl, {
+          width: 300,
+          height: 60,
+          content: '<div style="font-size:16px; font-weight:700; color:#0a0a0a;">Новый текстовый слой</div>'
         });
       } else if (type === 'button') {
-        block.data.elements.push({
-          id,
-          type: 'button',
-          x: 40,
-          y: 80,
+        Object.assign(newEl, {
           width: 180,
+          height: 44,
           text: 'Кнопка действия',
           url: 'https://example.com',
           bgColor: '#1e50ff',
           textColor: '#ffffff',
-          borderRadius: 0,
+          radius: 4,
           fontSize: 14,
-          zIndex: 3
+          strokeWidth: 0
+        });
+      } else if (type === 'rect') {
+        Object.assign(newEl, {
+          width: 220,
+          height: 140,
+          fill: '#f1f5f9',
+          strokeColor: '#cbd5e1',
+          strokeWidth: 1,
+          strokeStyle: 'solid',
+          radius: 6,
+          opacity: 1
+        });
+      } else if (type === 'circle') {
+        Object.assign(newEl, {
+          width: 60,
+          height: 60,
+          fill: '#10b981',
+          strokeColor: '#ffffff',
+          strokeWidth: 2,
+          text: '★',
+          textColor: '#ffffff'
+        });
+      } else if (type === 'line') {
+        Object.assign(newEl, {
+          width: 320,
+          height: 2,
+          strokeColor: '#cbd5e1',
+          strokeWidth: 2,
+          strokeStyle: 'solid'
         });
       } else if (type === 'image') {
-        block.data.elements.push({
-          id,
-          type: 'image',
-          x: 40,
-          y: 40,
-          width: 160,
-          height: 120,
-          url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=320&auto=format&fit=crop&q=80',
-          alt: 'Элемент',
-          zIndex: 1
+        Object.assign(newEl, {
+          width: 180,
+          height: 140,
+          url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=360&auto=format&fit=crop&q=80',
+          alt: 'Изображение',
+          radius: 4
+        });
+      } else if (type === 'icon') {
+        Object.assign(newEl, {
+          width: 48,
+          height: 48,
+          iconName: 'star',
+          color: '#1e50ff'
+        });
+      } else if (type === 'badge') {
+        Object.assign(newEl, {
+          width: 100,
+          height: 26,
+          text: 'NEW 2026',
+          bgColor: '#0a0a0a',
+          textColor: '#ffffff',
+          radius: 4,
+          fontSize: 11
         });
       }
+
+      block.data.elements.push(newEl);
       BuilderState.selectedZeroElementId = id;
       CanvasRenderer.render();
+      Inspector.render();
+      showToast(`Слой «${type}» добавлен`);
       triggerAutoSave();
     }
+
+    function duplicateZeroElement(elId) {
+      const block = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
+      if (!block || block.type !== 'zero_block') return;
+      const el = block.data.elements.find(x => x.id === elId);
+      if (!el) return;
+
+      const clone = JSON.parse(JSON.stringify(el));
+      clone.id = 'ze_' + Math.random().toString(36).substr(2, 6);
+      clone.x += 15;
+      clone.y += 15;
+      clone.zIndex = (block.data.elements.length || 0) + 1;
+      block.data.elements.push(clone);
+      BuilderState.selectedZeroElementId = clone.id;
+      CanvasRenderer.render();
+      Inspector.render();
+      showToast('Слой продублирован');
+      triggerAutoSave();
+    }
+
+    function deleteSelectedZeroElement() {
+      const block = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
+      if (!block || block.type !== 'zero_block' || !BuilderState.selectedZeroElementId) return;
+
+      const idx = block.data.elements.findIndex(x => x.id === BuilderState.selectedZeroElementId);
+      if (idx !== -1) {
+        block.data.elements.splice(idx, 1);
+        BuilderState.selectedZeroElementId = null;
+        CanvasRenderer.render();
+        Inspector.render();
+        showToast('Слой удален');
+        triggerAutoSave();
+      }
+    }
+
+    function changeZeroElementZIndex(delta) {
+      const block = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
+      if (!block || block.type !== 'zero_block' || !BuilderState.selectedZeroElementId) return;
+      const el = block.data.elements.find(x => x.id === BuilderState.selectedZeroElementId);
+      if (el) {
+        el.zIndex = Math.max(1, (el.zIndex || 1) + delta);
+        CanvasRenderer.render();
+        Inspector.render();
+        triggerAutoSave();
+      }
+    }
+
+    // Клавиатурные стрелки в стиле Figma (Nudge 1px / 10px) и Delete
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement && document.activeElement.isContentEditable) return;
+      if (document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+      const block = BuilderState.blocks.find(b => b.id === BuilderState.selectedBlockId);
+      if (!block || block.type !== 'zero_block' || !BuilderState.selectedZeroElementId) return;
+      const el = block.data.elements.find(x => x.id === BuilderState.selectedZeroElementId);
+      if (!el) return;
+
+      const step = e.shiftKey ? 10 : 1;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        el.x = Math.max(0, el.x - step);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        el.x = Math.max(0, el.x + step);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        el.y = Math.max(0, el.y - step);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        el.y = Math.max(0, el.y + step);
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        deleteSelectedZeroElement();
+        return;
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        duplicateZeroElement(el.id);
+        return;
+      } else if (e.key === 'Escape') {
+        BuilderState.selectedZeroElementId = null;
+        CanvasRenderer.render();
+        Inspector.render();
+        return;
+      } else {
+        return;
+      }
+
+      CanvasRenderer.render();
+      Inspector.render();
+      triggerAutoSave();
+    });
 
     // ================= ПОПАП БЫСТРОГО ВЫБОРА БЛОКА =================
     const quickPicker = document.getElementById('quickPickerPopover');
@@ -3189,13 +3817,11 @@
       }
     }
 
-    // Вспомогательная функция куки
     function getCookie(name) {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       return match ? match[2] : null;
     }
 
-    // Всплывающие уведомления (Toast)
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
       const toast = document.createElement('div');
@@ -3258,7 +3884,6 @@
         e.dataTransfer.setData('text/plain', type);
       });
 
-      // Клик по палитре также добавляет блок в конец
       item.addEventListener('click', () => {
         const type = item.getAttribute('data-type');
         insertBlockAt(type, BuilderState.blocks.length);
@@ -3273,7 +3898,6 @@
       const tplId = urlParams.get('id');
 
       if (tplId) {
-        // Загрузка шаблона из БД
         try {
           const token = getCookie('token');
           const res = await fetch('/api/templates', {
@@ -3306,7 +3930,6 @@
         }
       }
 
-      // Если холст пустой — добавим базовый набор приветственного письма
       if (BuilderState.blocks.length === 0) {
         const presets = typeof PRESET_TEMPLATES !== 'undefined' ? PRESET_TEMPLATES : [];
         if (presets.length > 0 && !isNew) {
